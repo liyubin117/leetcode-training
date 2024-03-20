@@ -1,7 +1,7 @@
 # 数组
 ## 27 移除元素 easy
 快慢指针，快指针指向要保留的元素值，慢指针指向删除元素后的数组的索引。快指针是读指针，慢指针是写指针
-```
+```java
     public int removeElement(int[] nums, int val) {
         //双指针
         int fast = 0, slow = 0;
@@ -18,7 +18,7 @@
 双指针，选较大的那个值逆序放到结果集并移动指针 
 ## 209 长度最小的子数组 middle 
 滑动窗口，注意j是窗口的终止位置。具体：每一轮迭代，将 nums[end] 加到 sum ，如果 sum >= s ，则更新子数组的最小长度（此时子数组的长度是 end−start+1），然后将 nums[start] 从 sum 中减去并将 start 右移，直到 sum<s，在此过程中同样更新子数组的最小长度。在每一轮迭代的最后，将 end 右移。
-```
+```java
     public int minSubArrayLen(int target, int[] nums) {
         int i = 0, j = 0, sum = 0, result = Integer.MAX_VALUE;
         for(; j < nums.length; j++) {
@@ -33,7 +33,7 @@
 ```
 ## 59 螺旋矩阵2 middle 
 边界是left right top bottom，循环到n*n次赋值结束
-```
+```java
     public int[][] generateMatrix(int n) {
             int left = 0, right = n-1, top = 0, bottom = n-1;
             int count = 1, target = n * n;
@@ -69,7 +69,7 @@
 ```
 ## 15 三数之和且不可出现重复三元组 middle 
 先排序，固定一个点i后双指针left/right，再移动这个点，要注意去重
-```
+```java
     public List<List<Integer>> threeSum(int[] nums) {
         List<List<Integer>> result = new ArrayList<>();
         Arrays.sort(nums);
@@ -95,7 +95,7 @@
 ```
 ## 18 四数之和 middle 
 在三数之和基础上多了一层for循环，注意有一级剪枝/去重，二级剪枝/去重，且不能过早return结果，剪枝后break即可
-```
+```java
     public List<List<Integer>> fourSum(int[] nums, int target) {
         List<List<Integer>> result = new ArrayList<>();
         Arrays.sort(nums);
@@ -127,7 +127,7 @@
 # 链表
 ## LCR 136 删除链表的节点 easy 
 虚拟头节点next指针指向head节点，即可使用统一的方式遍历删除指定节点
-```
+```java
     public ListNode deleteNode(ListNode head, int val) {
         //虚拟头节点
         ListNode dummyHead = new ListNode(-1), cur = dummyHead, tmp;
@@ -145,7 +145,7 @@
 ## 707 设计链表 middle 
 ## 19 删除链表倒数第N个节点
 快慢指针 构建dummyHead虚拟头节点，快慢指针都指向该dummyHead，先让快指针跑N个节点，慢指针再开始跑，直到快指针到null，此时慢指针指向的就是待删除节点的前一个节点，再让慢指针next指向next.next，再返回虚拟头节点next
-```
+```java
     public ListNode removeNthFromEnd(ListNode head, int n) {
         ListNode dummyNode = new ListNode(0);
         dummyNode.next = head;
@@ -169,7 +169,7 @@
     }
 ```
 ## 206 反转链表 easy
-```
+```java
     public ListNode reverseList(ListNode head) {
         ListNode cur = head, pre = null;
         while (cur != null) {
@@ -183,7 +183,7 @@
 ```
 ## 143 重排链表 middle 
 使用线性表支持下标的特性，但这个的空间复杂度是O(N)，还可使用寻找链表中点 + 链表逆序 + 合并链表的方式，空间复杂度O(1)
-```
+```java
     public void reorderList(ListNode head) {
         List<ListNode> list = new ArrayList<>();
         ListNode cur = head;
@@ -204,7 +204,7 @@
 ```
 ## 237 删除链表中的节点 middle 
 由于只给定了要删除的节点node，不能使用遍历的方法，而是将node的值改为下一个节点，再将node下一个节点指向下下一个节点即可
-```
+```java
     public void deleteNode(ListNode node) {
         node.val = node.next.val;
         node.next = node.next.next;
@@ -212,7 +212,7 @@
 ```
 ## 382 链表随机节点 middle
 使用线性表
-```
+```java
 class Solution {
     List<ListNode> list = new ArrayList<>();
     Random random = new Random();
@@ -232,7 +232,7 @@ class Solution {
 ```
 ## 160 相交链表 easy 
 使用哈希集合寻找相交的起始节点
-```
+```java
     public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
         Set<ListNode> set = new HashSet<>();
         ListNode curA = headA, curB = headB;
@@ -252,7 +252,7 @@ class Solution {
 常用于解决多个集合间是否有出现过的元素，结构可以有数组、set、map，当哈希值可控，较少时使用数组，较多时使用set；哈希值不可控时使用map
 ## 242 有效的字母异位词 easy 
 哈希值是固定的即26个字母，构建int[26]，字符串的每个元素-'a'即可作为数组索引，遍历第一个字符串加值，第二个字符串减值，若最终都为0则说明true
-```
+```java
     public boolean isAnagram(String s, String t) {
         int[] hash = new int[26];
         for (int i = 0; i < s.length(); i++) {
@@ -269,7 +269,7 @@ class Solution {
 ```
 ## 349 两个数组的交集 easy 
 由于值最大是1000，定义哈希数组int[1001]，一个写，一个读，找到大于0的值，其索引即交集元素
-```
+```java
     public int[] intersection(int[] nums1, int[] nums2) {
         int hash[] = new int[1001];
         Set<Integer> sets = new HashSet<>();
@@ -288,7 +288,7 @@ class Solution {
 ```
 ## 454 四数相加 middle 
 由于哈希值不可控，使用map结构。两个数组遍历后写入hash，另外两个数组遍历后找-key并将count加上所得的map值
-```
+```java
     public int fourSumCount(int[] nums1, int[] nums2, int[] nums3, int[] nums4) {
         Map<Integer, Integer> hash = new HashMap<>();
         int count = 0;
@@ -323,7 +323,7 @@ class Solution {
 ```
 ## 541 反转字符串2 easy 
 注意遍历时是2k递增的，每次处理时要判断end索引值是否够k个元素，若不是则直接取最后一个元素
-```
+```java
     public String reverseStr(String s, int k) {
         char[] arr = s.toCharArray();
         for (int i = 0; i < arr.length; i += 2 * k) {
@@ -342,7 +342,7 @@ class Solution {
 ```
 ## 151 反转字符串里的单词 middle 
 比较简单的做法是对字符串进行trim split转换后再倒序添加到新的字符串，但空间复杂度高。还可以用双指针，1.去除首尾以及中间多余空格 2.反转整个字符串 3.反转各个单词
-```
+```java
 //简单的做法，使用java内置方法
     public String reverseWords(String s) {
         List<String> list = Arrays.asList(s.trim().split("( )+"));
@@ -353,7 +353,7 @@ class Solution {
         result += list.get(0).trim();
         return result;
     }
-//双指针
+    //双指针
     public String reverseWords(String s) {
         // System.out.println("ReverseWords.reverseWords2() called with: s = [" + s + "]");
         // 1.去除首尾以及中间多余空格
@@ -414,7 +414,7 @@ class Solution {
 ```
 ## 459 重复的子字符串 easy
 可以用kmp算法，但比较复杂，直接归纳出特性然后判断
-```
+```java
     public boolean repeatedSubstringPattern(String s) {
         return (s + s).indexOf(s, 1) != s.length();
     }
@@ -423,7 +423,7 @@ class Solution {
 # 栈和队列
 先进后出，擅长相邻元素的消除
 ## 232 用两个栈实现队列 easy
-``` 
+```java
     class MyQueue {
         Deque<Integer> inStack;
         Deque<Integer> outStack;
@@ -463,7 +463,7 @@ class Solution {
     }
 ```
 ## 225 用一个队列模拟栈 easy
-```
+```java
     class MyStack {
         Queue<Integer> queue;
     
@@ -493,7 +493,7 @@ class Solution {
     }
 ```
 ## 20 有效的括号 easy
-```
+```java
     public boolean isValid(String s) {
         Stack<Character> stack = new Stack<>();
         for (Character c : s.toCharArray()) {
@@ -510,7 +510,7 @@ class Solution {
     }
 ```
 ## 1047 删除字符串中的所有相邻重复项 easy
-```
+```java
     public String removeDuplicates(String s) {
         Deque<Character> stack = new ArrayDeque<>();
         String result = "";
@@ -526,7 +526,7 @@ class Solution {
 ```
 ## 150 逆波兰表达式 middle
 即后缀表达式，二叉树的后序遍历
-```
+```java
     public int evalRPN(String[] tokens) {
         Deque<String> stack = new ArrayDeque<>();
         Map<String, BiFunction<Integer, Integer, Integer>> map = new HashMap<>();
@@ -547,7 +547,7 @@ class Solution {
 ```
 ## 239 滑动窗口最大值 hard
 使用优先级队列最大堆可以解决，元素是数组值、下标结构，堆顶元素即为当前堆的最大值，先初始化第一个窗口的值，再加入新的值到队列，循环判断当前堆顶元素这是否在窗口中，在则直接返回，不在则删除堆顶元素。其实还能用双端队列，但比较难理解
-```
+```java
     public int[] maxSlidingWindow(int[] nums, int k) {
         Queue<int[]> queue = new PriorityQueue<>((p1, p2) -> p1[0] == p2[0] ? p2[1] - p1[1] : p2[0] - p1[0]);
         int[] res = new int[nums.length - k + 1];
@@ -566,7 +566,7 @@ class Solution {
 ```
 ## 347 前k个高频元素 middle
 使用最小堆解决，元素是一个Map.Entry，键是数组值，值是出现次数
-```
+```java
     public int[] topKFrequent(int[] nums, int k) {
         Queue<Map.Entry<Integer, Integer>> queue = new PriorityQueue<>((p1, p2) -> p1.getValue() - p2.getValue());
         Map<Integer, Integer> map = new HashMap<>();
@@ -590,7 +590,7 @@ class Solution {
 ```
 # 递归
 ## 144 二叉树的前序遍历 easy
-```
+```java
     //递归 中左右
     class Solution {
         public List<Integer> preorderTraversal(TreeNode root) {
@@ -624,7 +624,7 @@ class Solution {
 ```
 ## 145 二叉树的前序遍历 easy
 若用迭代栈，后序遍历是先中左右再双指针进行翻转
-```
+```java
     public List<Integer> postorderTraversal(TreeNode root) {
         List<Integer> result = new ArrayList<>();
         Stack<TreeNode> stack = new Stack<>();
@@ -650,7 +650,7 @@ class Solution {
 ```
 ## 95 二叉树的中序遍历 easy
 若用迭代，循环迭代左侧节点入栈，直到无左侧节点时将当前节点定位到栈的顶端元素即父节点，将其出栈，再将当前节点定位到右孩子节点。直到栈无元素或当前节点为空
-```
+```java
     public List<Integer> inorderTraversal(TreeNode root) {
         List<Integer> result = new ArrayList<>();
         Stack<TreeNode> stack = new Stack<>();
@@ -670,7 +670,7 @@ class Solution {
 ```
 ## 102 二叉树的层序遍历 middle
 可用递归和迭代队列两种方式实现BFS，递归更容易理解
-```
+```java
     class Solution {
         private List<List<Integer>> resList = new ArrayList<List<Integer>>();
     
@@ -718,7 +718,7 @@ class Solution {
 ```
 ## 226 翻转二叉树 easy
 使用前序遍历或后序遍历比较容易。若用中序遍历，recurse(left) swap(node) recurse(left) 
-```
+```java
     public TreeNode invertTree(TreeNode root) {
         recurse(root);
         return root;
@@ -735,7 +735,7 @@ class Solution {
 ```
 ## 101 对称二叉树 easy
 只能使用后序遍历，需要先收集孩子的信息再向上一层返回。若外侧、内侧都对应相同则是对称的
-```
+```java
     public boolean isSymmetric(TreeNode root) {
         return recurse(root.left, root.right);
     }
@@ -752,7 +752,7 @@ class Solution {
 ```
 ## 104 二叉树的最大深度 easy
 后序遍历，找出左右孩子的较大高度+1后即为该节点的高度，根节点的高度是这个二叉树的最大深度。
-```
+```java
     class Solution {
         int result = 0;
         public int maxDepth(TreeNode root) {
@@ -765,7 +765,7 @@ class Solution {
 ```
 ## 111 二叉树的最小深度 easy
 后序遍历，根节点的最小高度即这个二叉树的最小深度。若左右孩子有为空的，则找左右孩子较大深度+1作为该节点的高度，若左右孩子都非空，则找左右孩子较小深度+1作为该节点的高度
-```
+```java
 class Solution {
     int result = 0;
     public int minDepth(TreeNode root) {
@@ -779,7 +779,7 @@ class Solution {
 ```
 ## 222 完全二叉树的的节点个数 easy
 后序遍历，找出左右孩子的节点个数再加1，即当前节点所在子树的节点个数
-```
+```java
     class Solution {
         int result = 0;
         public int countNodes(TreeNode root) {
@@ -792,7 +792,7 @@ class Solution {
 ```
 ## 110 平衡二叉树 easy
 后序遍历，在求节点高度的过程中，判断左右节点高度差是否小于2，若不是则直接返回-1即不符合平衡二叉树，其判断不符合的依据是高度差大于1、左节点已不符合、右节点已不符合
-```
+```java
     class Solution {
         public boolean isBalanced(TreeNode root) {
             return getHeight(root) != -1 ? true : false;
@@ -809,7 +809,7 @@ class Solution {
 ```
 ## 257 二叉树的所有路径 easy
 前序遍历+回溯
-```
+```java
     public List<String> binaryTreePaths(TreeNode root) {
         List<String> result = new ArrayList<>();
         recurse(root, new ArrayList<String>(), result);
@@ -830,7 +830,7 @@ class Solution {
 ```
 ## 404 左叶子之和 easy
 后序遍历，当中间节点满足左孩子是左叶节点时，加上左叶节点的值
-```
+```java
     public int sumOfLeftLeaves(TreeNode root) {
         if(root==null) return 0;
         return sumOfLeftLeaves(root.left) 
@@ -933,10 +933,66 @@ class Solution {
         }
     }
 ```
+## 654 最大二叉树 middle
+前序遍历
+- 确定入参和返回值：参数传入的是存放元素的数组、左闭索引、右开索引，返回该数组构造的二叉树的头结点
+- 终止条件：如果传入的数组大小为1，说明遍历到了叶子节点则返回，如果右标小于左标说明没有元素直接返回null
+- 单层递归的逻辑：先找到最大值作为根节点，并记录其下标用来分割数组maxIndex，[leftIndex, maxIndex)作为左子树，[maxIndex+1, rightIndex)作为右子树
+```java
+    class Solution {
+        public TreeNode constructMaximumBinaryTree(int[] nums) {
+            return constructMaximumBinaryTree1(nums, 0, nums.length);
+        }
+    
+        public TreeNode constructMaximumBinaryTree1(int[] nums, int leftIndex, int rightIndex) {
+            if (rightIndex - leftIndex < 1) {// 没有元素了
+                return null;
+            }
+            if (rightIndex - leftIndex == 1) {// 只有一个元素
+                return new TreeNode(nums[leftIndex]);
+            }
+            int maxIndex = leftIndex;// 最大值所在位置
+            int maxVal = nums[maxIndex];// 最大值
+            for (int i = leftIndex + 1; i < rightIndex; i++) {
+                if (nums[i] > maxVal){
+                    maxVal = nums[i];
+                    maxIndex = i;
+                }
+            }
+            TreeNode root = new TreeNode(maxVal);
+            // 根据maxIndex划分左右子树
+            root.left = constructMaximumBinaryTree1(nums, leftIndex, maxIndex);
+            root.right = constructMaximumBinaryTree1(nums, maxIndex + 1, rightIndex);
+            return root;
+        }
+    }
+```
+## 617 合并二叉树 easy
+前序遍历
+```java
+    public TreeNode mergeTrees(TreeNode root1, TreeNode root2) {
+        if (root1 == null) return root2;
+        if (root2 == null) return root1;
+        root1.val += root2.val;
+        root1.left = mergeTrees(root1.left, root2.left);
+        root1.right = mergeTrees(root1.right, root2.right);
+        return root1;
+        }
+```
+## 700 二叉搜索树中的搜索 easy
+```java
+    public TreeNode searchBST(TreeNode root, int val) {
+        if (root == null || root.val == val) return root;
+        TreeNode result = null;
+        if (root.left != null && root.val > val) result = searchBST(root.left, val);
+        if (root.right != null && root.val < val) result = searchBST(root.right, val);
+        return result;
+    }
+```
 
 # 模拟
 ## 2899 上一个遍历的整数 easy
-```
+```java
     public List<Integer> lastVisitedIntegers(int[] nums) {
         List<Integer> seen = new ArrayList<>(), ans = new ArrayList<>();
         int index = 1;
