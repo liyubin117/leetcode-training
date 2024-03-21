@@ -15,24 +15,43 @@
     }
 ```
 ## 977 有序数组的平方 easy 
-双指针，选较大的那个值逆序放到结果集并移动指针 
+双指针，选较大的那个值逆序放到结果集并移动相应的指针
+```java
+    public int[] sortedSquares(int[] nums) {
+        int[] result = new int[nums.length];
+        int k = nums.length - 1;
+        for (int l = 0, r = nums.length - 1; l <= r;) {
+            int a = nums[l] * nums[l], b = nums[r] * nums[r];
+            if (a > b) {
+                result[k] = a;
+                l++;
+            }
+            else {
+                result[k] = b;
+                r--;
+            }
+            k--;
+        }
+        return result;
+    }
+```
 ## 209 长度最小的子数组 middle 
-滑动窗口，注意j是窗口的终止位置。具体：每一轮迭代，将 nums[end] 加到 sum ，如果 sum >= s ，则更新子数组的最小长度（此时子数组的长度是 end−start+1），然后将 nums[start] 从 sum 中减去并将 start 右移，直到 sum<s，在此过程中同样更新子数组的最小长度。在每一轮迭代的最后，将 end 右移。
+滑动窗口，注意end是窗口的终止位置。具体：每一轮迭代，将 nums[end] 加到 sum ，如果 sum >= s ，则更新子数组的最小长度（此时子数组的长度是 end−start+1），然后将 nums[start] 从 sum 中减去并将 start 右移，直到 sum<s，在此过程中同样更新子数组的最小长度。在每一轮迭代的最后，将 end 右移。
 ```java
     public int minSubArrayLen(int target, int[] nums) {
-        int i = 0, j = 0, sum = 0, result = Integer.MAX_VALUE;
-        for(; j < nums.length; j++) {
-            sum += nums[j];
+        int begin = 0, end = 0, sum = 0, result = Integer.MAX_VALUE;
+        for(; end < nums.length; end++) {
+            sum += nums[end];
             while (sum >= target) {
-                result = Math.min(result, j - i + 1);
-                sum -= nums[i++];
+                result = Math.min(result, end - begin + 1);
+                sum -= nums[begin++];
             }
         }
         return result == Integer.MAX_VALUE ? 0 : result;
     }
 ```
 ## 59 螺旋矩阵2 middle 
-边界是left right top bottom，循环到n*n次赋值结束
+边界是left right top bottom，i代表横边，j代表纵边，循环到n*n次赋值结束
 ```java
     public int[][] generateMatrix(int n) {
             int left = 0, right = n-1, top = 0, bottom = n-1;
