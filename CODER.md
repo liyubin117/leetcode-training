@@ -19,6 +19,7 @@ a * b 二维数组， [x][y]元素对应的一维数组索引是bx+y
 * 满二叉树：除了叶子节点，每个节点都有两个孩子，所有叶子节点都在同一层
 * 完全二叉树：从根节点开始从上到下，从左到右填满节点
 * 平衡二叉树：左右子树高度差不大于1
+* 二叉搜索树：左子树所有节点都小于根节点，根节点小于右子树所有节点
 ## 存储结构
 数组存储时，i的左孩子是i*2+1，右孩子是i*2+2，父节点是(i-1)/2
 ## 属性 
@@ -220,6 +221,7 @@ m大于等于3，小于等于14，即在蔡勒公式中，某年的1,2月份要�
 * Arrays.fill(int[], int) 给数组的每个位置赋值指定值
 * Arrays.asList(...) 将一些不定长入参转换成List
 * T[] Arrays.copyOfRange(T[], from, to) 返回一个原数组从包含from到不包含to的数组
+* list.stream().mapToInt(Integer::intValue).toArray() 将一个List<Integer>转换成int[]
 * Integer.toBinaryString()
 * Integer.bitCount() 二进制1的数量
 * Integer.reverse() 颠倒二进制数
