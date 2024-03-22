@@ -2,5 +2,6 @@
 
 * [day1](README.md)
 * [day2](DAY2.md)
+* [day3](DAY3.md)
 * [solution](SOLUTION.md)
 * [coder](CODER.md)
