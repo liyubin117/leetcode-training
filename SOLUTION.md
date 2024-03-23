@@ -252,18 +252,20 @@ class Solution {
 ## 160 相交链表 easy 
 使用哈希集合寻找相交的起始节点
 ```java
-public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
-    Set<ListNode> set = new HashSet<>();
-    ListNode curA = headA, curB = headB;
-    while (curA != null) {
-        set.add(curA);
-        curA = curA.next;
+public class Solution {
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        Set<ListNode> set = new HashSet<>();
+        ListNode curA = headA, curB = headB;
+        while (curA != null) {
+            set.add(curA);
+            curA = curA.next;
+        }
+        while (curB != null) {
+            if (set.contains(curB)) return curB;
+            curB = curB.next;
+        }
+        return null;
     }
-    while (curB != null) {
-        if (set.contains(curB)) return curB;
-        curB = curB.next;
-    }
-    return null;
 }
 ```
 
