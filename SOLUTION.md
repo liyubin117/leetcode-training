@@ -1106,6 +1106,29 @@ class Solution {
     }
 }
 ```
+## 235 二叉搜索树的公共祖先 middle
+本题中的搜索树的值是唯一的，根据二叉搜索树的特性，左右节点应该分别小于、大于最近的公共祖先节点，最近的公共祖先可能不是根节点。当都小于某节点时说明公共祖先在此节点的左子树，反之同理
+```java
+//迭代法
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        while (root != null) {
+            if (p.val < root.val && q.val < root.val) root = root.left;
+            else if (p.val > root.val && q.val > root.val) root = root.right;
+            else break;
+        }
+        return root;
+    }
+}
+//递归法
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if (root.val > p.val && root.val > q.val) return lowestCommonAncestor(root.left, p, q);
+        if (root.val < p.val && root.val < q.val) return lowestCommonAncestor(root.right, p, q);
+        return root;
+    }
+}
+```
 
 # 模拟
 ## 2899 上一个遍历的整数 easy
