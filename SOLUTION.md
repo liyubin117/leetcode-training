@@ -53,93 +53,99 @@ public int minSubArrayLen(int target, int[] nums) {
 ## 59 螺旋矩阵2 middle 
 边界是left right top bottom，i代表横边，j代表纵边，循环到n*n次赋值结束
 ```java
-public int[][] generateMatrix(int n) {
-        int left = 0, right = n-1, top = 0, bottom = n-1;
+class Solution {
+    public int[][] generateMatrix(int n) {
+        int left = 0, right = n - 1, top = 0, bottom = n - 1;
         int count = 1, target = n * n;
         int[][] res = new int[n][n];
         //for循环中变量定义成i或j的细节：按照通常的思维，i代表行，j代表列
         //这样，就可以很容易区分出来变化的量应该放在[][]的第一个还是第二个
         //对于变量的边界怎么定义：
-            //从左向右填充：填充的列肯定在[left,right]区间
-            //从上向下填充：填充的行肯定在[top,bottom]区间
-            //从右向左填充：填充的列肯定在[right,left]区间
-            //从下向上填充：填充的行肯定在[bootom,top]区间
+        //从左向右填充：填充的列肯定在[left,right]区间
+        //从上向下填充：填充的行肯定在[top,bottom]区间
+        //从右向左填充：填充的列肯定在[right,left]区间
+        //从下向上填充：填充的行肯定在[bootom,top]区间
         //通过上面的总结会发现边界的起始和结束与方向是对应的
-        while(count <= target){
+        while (count <= target) {
             //从左到右填充，相当于缩小上边界
-            for(int j = left; j <= right; j++) res[top][j] = count++;
+            for (int j = left; j <= right; j++) res[top][j] = count++;
             //缩小上边界
             top++;
             //从上向下填充，相当于缩小右边界
-            for(int i = top; i <=bottom; i++) res[i][right] = count++;
+            for (int i = top; i <= bottom; i++) res[i][right] = count++;
             //缩小右边界
             right--;
             //从右向左填充，相当于缩小下边界
-            for(int j = right; j >= left; j--) res[bottom][j] = count++;
+            for (int j = right; j >= left; j--) res[bottom][j] = count++;
             //缩小下边界
             bottom--;
             //从下向上填充，相当于缩小左边界
-            for(int i = bottom; i >= top; i--) res[i][left] = count++;
+            for (int i = bottom; i >= top; i--) res[i][left] = count++;
             //缩小左边界
             left++;
         }
         return res;
+    }
 }
 ```
 ## 15 三数之和且不可出现重复三元组 middle 
 先排序，固定一个点i后双指针left/right，再移动这个点，要注意去重
 ```java
-public List<List<Integer>> threeSum(int[] nums) {
-    List<List<Integer>> result = new ArrayList<>();
-    Arrays.sort(nums);
-    for (int i = 0; i < nums.length; i++) {
-        if (nums[i] > 0) return result; // 排序之后如果第一个元素已经大于零，那么无论如何组合都不可能凑成三元组，直接返回结果就可以了
-        if (i > 0 && nums[i] == nums[i - 1]) continue; //去重a
-        int left = i + 1, right = nums.length - 1;
-        while (left < right) {
-            int tmp = nums[i] + nums[left] + nums[right];
-            if (tmp < 0) left++;
-            else if (tmp > 0) right--;
-            else {
-                result.add(Arrays.asList(nums[i], nums[left], nums[right]));
-                while (left < right && nums[left] == nums[left + 1]) left++; //去重b
-                while (left < right && nums[right] == nums[right - 1]) right--; //去重c
-                left++;
-                right--;
+class Solution {
+    public List<List<Integer>> threeSum(int[] nums) {
+        List<List<Integer>> result = new ArrayList<>();
+        Arrays.sort(nums);
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] > 0) break; // 排序之后如果第一个元素已经大于零，那么无论如何组合都不可能凑成三元组，直接返回结果就可以了
+            if (i > 0 && nums[i] == nums[i - 1]) continue; //去重a
+            int left = i + 1, right = nums.length - 1;
+            while (left < right) {
+                int tmp = nums[i] + nums[left] + nums[right];
+                if (tmp < 0) left++;
+                else if (tmp > 0) right--;
+                else {
+                    result.add(Arrays.asList(nums[i], nums[left], nums[right]));
+                    while (left < right && nums[left] == nums[left + 1]) left++; //去重b
+                    while (left < right && nums[right] == nums[right - 1]) right--; //去重c
+                    left++;
+                    right--;
+                }
             }
         }
+        return result;
     }
-    return result;
 }
 ```
 ## 18 四数之和 middle 
 在三数之和基础上多了一层for循环，注意有一级剪枝/去重，二级剪枝/去重，且不能过早return结果，剪枝后break即可
 ```java
-public List<List<Integer>> fourSum(int[] nums, int target) {
-    List<List<Integer>> result = new ArrayList<>();
-    Arrays.sort(nums);
-    for (int k = 0; k < nums.length; k++) {
-        if (nums[k] >= 0 && nums[k] > target) break; //一级剪枝
-        if (k > 0 && nums[k] == nums[k - 1]) continue; //一级去重a
-        for (int i = k + 1; i < nums.length; i++) {
-            if (nums[k] + nums[i] >= 0 && nums[k] + nums[i] > target) break; //二级剪枝
-            if (i > k + 1 && nums[i] == nums[i - 1]) continue; //二级去重b
-            int left = i + 1, right = nums.length - 1;
-            while (left < right) {
-                long sum = (long) nums[k] + nums[i] + nums[left] + nums[right];
-                if (sum > target) right--;
-                else if (sum < target) left++;
-                else {
-                    result.add(Arrays.asList(nums[k], nums[i], nums[left], nums[right]));
-                    while (left < right && nums[left] == nums[left + 1]) left++;
-                    while (left < right && nums[right] == nums[right - 1]) right--;
-                    left++;
-                    right--;
-                } 
+class Solution {
+    public List<List<Integer>> fourSum(int[] nums, int target) {
+        List<List<Integer>> result = new ArrayList<>();
+        Arrays.sort(nums);
+        for (int k = 0; k < nums.length; k++) {
+            if (nums[k] >= 0 && nums[k] > target) break;
+            if (k > 0 && nums[k] == nums[k - 1]) continue;
+            for (int i = k + 1; i < nums.length; i++) {
+                if (nums[k] + nums[i] >= 0 && nums[k] + nums[i] > target) break;
+                if (i > k + 1 && nums[i] == nums[i - 1]) continue;
+                int left = i + 1, right = nums.length - 1;
+                while (left < right) {
+                    long sum = (long) nums[k] + nums[i] + nums[left] + nums[right];
+                    if (sum > target) right--;
+                    else if (sum < target) left++;
+                    else {
+                        result.add(Arrays.asList(nums[k], nums[i], nums[left], nums[right]));
+                        while (left < right && nums[left] == nums[left + 1]) left++;
+                        while (left < right && nums[right] == nums[right - 1]) right--;
+                        left++;
+                        right--;
+                    }
+                }
             }
         }
+        return result;
     }
-    return result;
 }
 ```
 
@@ -310,20 +316,22 @@ public int[] intersection(int[] nums1, int[] nums2) {
 ## 454 四数相加 middle 
 由于哈希值不可控，使用map结构。两个数组遍历后写入hash，另外两个数组遍历后找-key并将count加上所得的map值
 ```java
-public int fourSumCount(int[] nums1, int[] nums2, int[] nums3, int[] nums4) {
-    Map<Integer, Integer> hash = new HashMap<>();
-    int count = 0;
-    for (int i : nums1) {
-        for (int j : nums2) {
-            hash.compute(i + j, (key, value) -> value == null ? 1 : value + 1);
+class Solution {
+    public int fourSumCount(int[] nums1, int[] nums2, int[] nums3, int[] nums4) {
+        Map<Integer, Integer> hash = new HashMap<>();
+        int count = 0;
+        for (int i : nums1) {
+            for (int j : nums2) {
+                hash.compute(i + j, (key, value) -> value == null ? 1 : value + 1);
+            }
         }
-    }
-    for (int k : nums3) {
-        for (int l : nums4) {
-            count = count + hash.getOrDefault(-(k + l), 0);
+        for (int k : nums3) {
+            for (int l : nums4) {
+                count = count + hash.getOrDefault(-(k + l), 0);
+            }
         }
+        return count;
     }
-    return count;
 }
 ```
 
