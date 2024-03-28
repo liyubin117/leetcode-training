@@ -18,7 +18,6 @@
 
 空间复杂度：O(1)
 
-````java
 ```java
 class Solution {
     public int search(int[] nums, int target) {
@@ -33,7 +32,6 @@ class Solution {
     }
 }
 ```
-````
 
 
 
@@ -51,7 +49,6 @@ class Solution {
 
 空间复杂度：O(1)
 
-````java
 ```java
 class Solution {
     public int removeElement(int[] nums, int val) {
@@ -67,4 +64,3 @@ class Solution {
     }
 }
 ```
-````

@@ -226,13 +226,14 @@ m大于等于3，小于等于14，即在蔡勒公式中，某年的1,2月份要�
 * Integer.toBinaryString()
 * Integer.bitCount() 二进制1的数量
 * Integer.reverse() 颠倒二进制数
-* Collections.reverse() 颠倒List的顺序
+* Collections.reverse(List) 颠倒List的顺序
 * Collections.sort(List, Comparator) 可使用自定义比较函数进行排序
 * Character.isLetterOrDigit() 字符是否是数字或字母
 * Character.isLetter() 是否是字母
 * char String.charAt() 某索引位置的字符
 * String.join(delimiter, elements) 使用指定分隔符拼接e
 * String实例方法 char[] toCharArray() 转换成char数组
+* String实例方法 char charAt(int) 获取某索引处的字符
 
 # 常用java类
 * 栈 Stack ArrayDeque

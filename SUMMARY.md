@@ -6,5 +6,6 @@
 * [day4](DAY4.md)
 * [day6](DAY6.md)
 * [day7](DAY7.md)
+* [day8](DAY8.md)
 * [solution](SOLUTION.md)
 * [coder](CODER.md)
