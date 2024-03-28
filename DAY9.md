@@ -8,13 +8,29 @@
 ```
 https://programmercarl.com/0028.%E5%AE%9E%E7%8E%B0strStr.html
 
+https://mp.weixin.qq.com/s?__biz=MzI0NjAxMDU5NA==&mid=2475924907&idx=1&sn=6f6fc1475be2d7d2ca5ab6e0ec755bca&chksm=ff22fa26c8557330a906f6ed9f444d71064a590109b093d8e97f0ab1cd82e5106a5138e8aecd&scene=21#wechat_redirect
+
+https://mp.weixin.qq.com/s?__biz=MzI0NjAxMDU5NA==&mid=2475925022&idx=1&sn=c115447f8ac5ef02793ec28918f7e032&chksm=ff22f993c85570856c237165a93340c76f7322f7538d16a7c15782f7cf8cd7375887e8db329f&token=290396534&lang=zh_CN#rd
+
 思路：内置函数indexOf()、暴力法或KMP
 
 复杂度：时间O(M+N) 空间O(M)
 ```java
+//内置函数indexOf()
 class Solution {
     public int strStr(String haystack, String needle) {
         return haystack.indexOf(needle);
+    }
+}
+//暴力法+内置函数startsWith()
+class Solution {
+    public int strStr(String haystack, String needle) {
+        int result = 0;
+        while (result < haystack.length()) {
+            if (haystack.substring(result).startsWith(needle)) return result;
+            result++;
+        }
+        return -1;
     }
 }
 //KMP
@@ -64,12 +80,39 @@ class Solution {
 ```
 https://programmercarl.com/%E5%8F%8C%E6%8C%87%E9%92%88%E6%80%BB%E7%BB%93.html
 
-思路：将两个 s 连在一起，并移除第一个和最后一个字符。如果 s 是该字符串的子串，那么 s 就满足题目要求。也可以用KMP做
+思路：两个字符串连在一起掐头去尾若能找到此字符串则符合要求。也可以用KMP做
 
 ```java
+//推导出特性进行验证
 class Solution {
     public boolean repeatedSubstringPattern(String s) {
         return (s + s).indexOf(s, 1) != s.length();
+    }
+}
+//KMP，len(s) % (len(s) -  maxLen) = 0，len(s) 为字符串 s 的长度，maxLen 为最长公共前后缀的长度，含义是如果 s 是周期串，那【s 的长度】是【s 的长度减去最长公共前后缀的长度】的倍数，那字符串 s 就是周期串。
+class Solution {
+    public int[] getNext(String s){
+        int i = 0, j = -1, n = s.length();
+        int[] next = new int[n];
+        next[0] = -1;
+
+        while(i < n - 1){
+            if(j == -1 || s.charAt(i) == s.charAt(j)){
+                i++;
+                j++;
+                next[i] = j;
+            } else j = next[j];
+        }
+        return next;
+    }
+
+    public boolean repeatedSubstringPattern(String s) {
+        int n = s.length();
+        if (n == 0) return false;
+        int[] next = getNext(s);
+        int maxLen = next[n - 1] + 1;
+        if(maxLen == 0 || s.charAt(n - 1) != s.charAt(n - 1 - maxLen)) return false;
+        return n % (n - maxLen) == 0;
     }
 }
 ```
