@@ -256,5 +256,5 @@ m大于等于3，小于等于14，即在蔡勒公式中，某年的1,2月份要�
 
 # 常用java类
 * 栈 Stack ArrayDeque
-* 最小堆 PriorityQueue
 * 双端队列 LinkedList
+* 最小堆 PriorityQueue
