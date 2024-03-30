@@ -444,6 +444,38 @@ class Solution {
     }
 }
 ```
+## 2325 解密消息 easy
+```
+给你字符串 key 和 message ，分别表示一个加密密钥和一段加密消息。解密 message 的步骤如下：
+
+使用 key 中 26 个英文小写字母第一次出现的顺序作为替换表中的字母 顺序 。
+将替换表与普通英文字母表对齐，形成对照表。
+按照对照表 替换 message 中的每个字母。
+空格 ' ' 保持不变。
+例如，key = "happy boy"（实际的加密密钥会包含字母表中每个字母 至少一次），据此，可以得到部分对照表（'h' -> 'a'、'a' -> 'b'、'p' -> 'c'、'y' -> 'd'、'b' -> 'e'、'o' -> 'f'）。
+返回解密后的消息。
+```
+思路：使用哈希表，键作为密钥，值作为明文，由于键空间是确定的，所以用数组作为哈希表
+```java
+class Solution {
+    public String decodeMessage(String key, String message) {
+        Character[] hash = new Character[26];
+        int index = 0;
+        StringBuffer sb = new StringBuffer();
+        for (Character c: key.toCharArray()) {
+            if (c != ' ' && hash[c - 'a'] == null) {
+                hash[c - 'a'] = (char)('a' + index);
+                index++;
+            }
+        }
+        for (Character c: message.toCharArray()) {
+            Character chr = c == ' ' ? ' ' : hash[c - 'a'];
+            sb.append(chr);
+        }
+        return sb.toString();
+    }
+}
+```
 
 # 字符串
 ## 344 反转字符串 easy 
@@ -1268,5 +1300,25 @@ public List<Integer> lastVisitedIntegers(int[] nums) {
         }
     }
     return ans;
+}
+```
+
+# 数学
+## 292 Nim游戏 easy
+```
+你和你的朋友，两个人一起玩 Nim 游戏：
+
+桌子上有一堆石头。
+你们轮流进行自己的回合， 你作为先手 。
+每一回合，轮到的人拿掉 1 - 3 块石头。
+拿掉最后一块石头的人就是获胜者。
+假设你们每一步都是最优解。请编写一个函数，来判断你是否可以在给定石头数量为 n 的情况下赢得游戏。如果可以赢，返回 true；否则，返回 false 。
+```
+思路：如果总的石头数目为 4 的倍数时，因为无论你取多少石头，对方总有对应的取法，你1 2 3，对方3 2 1，让剩余的石头的数目继续为 4 的倍数。对于你或者你的对手取石头时，显然最优的选择是当前己方取完石头后，让剩余的石头的数目为 4 的倍数。假设当前的石头数目为 x，如果 x 为 4 的倍数时，则此时你必然会输掉游戏；如果 x 不为 4 的倍数时，则此时你只需要取走 x % 4 个石头时，则剩余的石头数目必然为 4 的倍数，从而对手会输掉游戏。
+```java
+class Solution {
+    public boolean canWinNim(int n) {
+        return n % 4 != 0;
+    }
 }
 ```
