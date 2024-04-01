@@ -153,86 +153,155 @@ class Solution {
 ## LCR 136 删除链表的节点 easy 
 虚拟头节点next指针指向head节点，即可使用统一的方式遍历删除指定节点
 ```java
-public ListNode deleteNode(ListNode head, int val) {
-    //虚拟头节点
-    ListNode dummyHead = new ListNode(-1), cur = dummyHead, tmp;
-    dummyHead.next = head;
-    while (cur != null) {
-        tmp = cur.next;
-        if (tmp != null && tmp.val == val) {
-            cur.next = tmp.next;
+class Solution {
+    public ListNode deleteNode(ListNode head, int val) {
+        //虚拟头节点
+        ListNode dummyHead = new ListNode(-1), cur = dummyHead, tmp;
+        dummyHead.next = head;
+        while (cur != null) {
+            tmp = cur.next;
+            if (tmp != null && tmp.val == val) {
+                cur.next = tmp.next;
+            }
+            cur = cur.next;
         }
-        cur = cur.next;
+        return dummyHead.next;
     }
-    return dummyHead.next;
 }
 ```
 ## 707 设计链表 middle 
+用虚拟头节点
+```java
+//单链表
+class ListNode {
+    int val;
+    ListNode next;
+    public ListNode(int val) {
+        this.val = val;
+    }
+}
+class MyLinkedList {
+    ListNode head; // 虚拟头结点
+    int size; // 存储有效的链表元素的个数
+
+    public MyLinkedList() {
+        this.head = new ListNode(0);
+        this.size = 0;
+    }
+
+    public int get(int index) {
+        if (index < 0 || index >= size) return -1;
+        ListNode cur = head;
+        for (int i = 0; i <= index; i++) {
+            cur = cur.next;
+        }
+        return cur.val;
+    }
+
+    public void addAtHead(int val) {
+        addAtIndex(0, val);
+    }
+
+    public void addAtTail(int val) {
+        addAtIndex(size, val);
+    }
+
+    public void addAtIndex(int index, int val) {
+        if (index < 0 || index > size) return;
+        size++;
+        ListNode cur = head;
+        for (int i = 0; i < index; i++) {
+            cur = cur.next;
+        }
+        ListNode newNode = new ListNode(val);
+        newNode.next = cur.next;
+        cur.next = newNode;
+    }
+
+    public void deleteAtIndex(int index) {
+        if (index < 0 || index >= size) return;
+        size--;
+        ListNode cur = head;
+        for (int i = 0; i < index; i++) {
+            cur = cur.next;
+        }
+        cur.next = cur.next.next;
+    }
+}
+```
 ## 19 删除链表倒数第N个节点
 快慢指针 构建dummyHead虚拟头节点，快慢指针都指向该dummyHead，先让快指针跑N个节点，慢指针再开始跑，直到快指针到null，此时慢指针指向的就是待删除节点的前一个节点，再让慢指针next指向next.next，再返回虚拟头节点next
 ```java
-public ListNode removeNthFromEnd(ListNode head, int n) {
-    ListNode dummyNode = new ListNode(0);
-    dummyNode.next = head;
+class Solution {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        ListNode dummyNode = new ListNode(0);
+        dummyNode.next = head;
 
-    ListNode fastIndex = dummyNode;
-    ListNode slowIndex = dummyNode;
+        ListNode fastIndex = dummyNode;
+        ListNode slowIndex = dummyNode;
 
-    // 只要快慢指针相差 n 个结点即可
-    for (int i = 0; i <= n; i++) {
-        fastIndex = fastIndex.next;
+        // 只要快慢指针相差 n 个结点即可
+        for (int i = 0; i <= n; i++) {
+            fastIndex = fastIndex.next;
+        }
+
+        while (fastIndex != null) {
+            fastIndex = fastIndex.next;
+            slowIndex = slowIndex.next;
+        }
+
+        // 此时 slowIndex 的位置就是待删除元素的前一个位置。
+        slowIndex.next = slowIndex.next.next;
+        return dummyNode.next;
     }
-
-    while (fastIndex != null) {
-        fastIndex = fastIndex.next;
-        slowIndex = slowIndex.next;
-    }
-
-    // 此时 slowIndex 的位置就是待删除元素的前一个位置。
-    slowIndex.next = slowIndex.next.next;
-    return dummyNode.next;
 }
 ```
 ## 206 反转链表 easy
 ```java
-public ListNode reverseList(ListNode head) {
-    ListNode cur = head, pre = null;
-    while (cur != null) {
-        ListNode tmp = cur.next;
-        cur.next = pre;
-        pre = cur;
-        cur = tmp;
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        ListNode cur = head, pre = null;
+        while (cur != null) {
+            ListNode tmp = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = tmp;
+        }
+        return pre;
     }
-    return pre;
 }
 ```
 ## 143 重排链表 middle 
 使用线性表支持下标的特性，但这个的空间复杂度是O(N)，还可使用寻找链表中点 + 链表逆序 + 合并链表的方式，空间复杂度O(1)
 ```java
-public void reorderList(ListNode head) {
-    List<ListNode> list = new ArrayList<>();
-    ListNode cur = head;
-    while (cur != null) {
-        list.add(cur);
-        cur = cur.next;
+class Solution {
+    public void reorderList(ListNode head) {
+        List<ListNode> list = new ArrayList<>();
+        ListNode cur = head;
+        while (cur != null) {
+            list.add(cur);
+            cur = cur.next;
+        }
+        int l = 0, r = list.size() - 1;
+        while (l < r) {
+            list.get(l).next = list.get(r);
+            l++;
+            if (l == r) break;
+            list.get(r).next = list.get(l);
+            r--;
+        }
+        list.get(l).next = null; //此时将实际上的最后一个节点指向null，否则会cycle
     }
-    int l = 0, r = list.size() - 1;
-    while (l < r) {
-        list.get(l).next = list.get(r);
-        l++;
-        if (l == r) break;
-        list.get(r).next = list.get(l);
-        r--;
-    }
-    list.get(l).next = null; //此时将实际上的最后一个节点指向null，否则会cycle
 }
 ```
 ## 237 删除链表中的节点 middle 
 由于只给定了要删除的节点node，不能使用遍历的方法，而是将node的值改为下一个节点，再将node下一个节点指向下下一个节点即可
 ```java
-public void deleteNode(ListNode node) {
-    node.val = node.next.val;
-    node.next = node.next.next;
+class Solution {
+    public void deleteNode(ListNode node) {
+        node.val = node.next.val;
+        node.next = node.next.next;
+    }
 }
 ```
 ## 382 链表随机节点 middle
@@ -390,37 +459,41 @@ class LRUCache extends LinkedHashMap<Integer, Integer>{
 ## 242 有效的字母异位词 easy 
 哈希值是固定的即26个字母，构建int[26]，字符串的每个元素-'a'即可作为数组索引，遍历第一个字符串加值，第二个字符串减值，若最终都为0则说明true
 ```java
-public boolean isAnagram(String s, String t) {
-    int[] hash = new int[26];
-    for (int i = 0; i < s.length(); i++) {
-        hash[s.charAt(i) - 'a']++;
+class Solution {
+    public boolean isAnagram(String s, String t) {
+        int[] hash = new int[26];
+        for (int i = 0; i < s.length(); i++) {
+            hash[s.charAt(i) - 'a']++;
+        }
+        for (int i = 0; i < t.length(); i++) {
+            hash[t.charAt(i) - 'a']--;
+        }
+        for (int i = 0; i < hash.length; i++) {
+            if (hash[i] != 0) return false;
+        }
+        return true;
     }
-    for (int i = 0; i < t.length(); i++) {
-        hash[t.charAt(i) - 'a']--;
-    }
-    for (int i = 0; i < hash.length; i++) {
-        if (hash[i] != 0) return false;
-    }
-    return true;
 }
 ```
 ## 349 两个数组的交集 easy 
 由于值最大是1000，定义哈希数组int[1001]，一个写，一个读，找到大于0的值，其索引即交集元素
 ```java
-public int[] intersection(int[] nums1, int[] nums2) {
-    int hash[] = new int[1001];
-    Set<Integer> sets = new HashSet<>();
-    for (int i = 0; i < nums1.length; i++) {
-        hash[nums1[i]]++;
+class Solution {
+    public int[] intersection(int[] nums1, int[] nums2) {
+        int hash[] = new int[1001];
+        Set<Integer> sets = new HashSet<>();
+        for (int i = 0; i < nums1.length; i++) {
+            hash[nums1[i]]++;
+        }
+        for (int i = 0; i < nums2.length; i++) {
+            if (hash[nums2[i]] > 0) sets.add(nums2[i]);
+        }
+        int results[] = new int[sets.size()], index = 0;
+        for (int num : sets) {
+            results[index++] = num;
+        }
+        return results;
     }
-    for (int i = 0; i < nums2.length; i++) {
-        if (hash[nums2[i]] > 0) sets.add(nums2[i]);
-    }
-    int results[] = new int[sets.size()], index = 0;
-    for (int num: sets) {
-        results[index++] = num;
-    }
-    return results;
 }
 ```
 ## 454 四数相加 middle 
@@ -495,99 +568,107 @@ public void reverseString(char[] s) {
 ## 541 反转字符串2 easy 
 注意遍历时是2k递增的，每次处理时要判断end索引值是否够k个元素，若不是则直接取最后一个元素
 ```java
-public String reverseStr(String s, int k) {
-    char[] arr = s.toCharArray();
-    for (int i = 0; i < arr.length; i += 2 * k) {
-        int start = i;
-        int end = Math.min(start + k - 1, arr.length - 1);
-        while (start < end) {
-            char tmp = arr[start];
-            arr[start] = arr[end];
-            arr[end] = tmp;
-            start++;
-            end--;
+class Solution {
+    public String reverseStr(String s, int k) {
+        char[] arr = s.toCharArray();
+        for (int i = 0; i < arr.length; i += 2 * k) {
+            int start = i;
+            int end = Math.min(start + k - 1, arr.length - 1);
+            while (start < end) {
+                char tmp = arr[start];
+                arr[start] = arr[end];
+                arr[end] = tmp;
+                start++;
+                end--;
+            }
         }
+        return new String(arr);
     }
-    return new String(arr);
 }
 ```
 ## 151 反转字符串里的单词 middle 
 比较简单的做法是对字符串进行trim split转换后再倒序添加到新的字符串，但空间复杂度高。还可以用双指针，1.去除首尾以及中间多余空格 2.反转整个字符串 3.反转各个单词
 ```java
 //简单的做法，使用java内置方法
-public String reverseWords(String s) {
-    List<String> list = Arrays.asList(s.trim().split("( )+"));
-    String result = "";
-    for (int i = list.size() - 1; i > 0; i--) {
-        result += list.get(i).trim() + " ";
+class Solution {
+    public String reverseWords(String s) {
+        List<String> list = Arrays.asList(s.trim().split("( )+"));
+        String result = "";
+        for (int i = list.size() - 1; i > 0; i--) {
+            result += list.get(i).trim() + " ";
+        }
+        result += list.get(0).trim();
+        return result;
     }
-    result += list.get(0).trim();
-    return result;
 }
 //双指针
-public String reverseWords(String s) {
-    // System.out.println("ReverseWords.reverseWords2() called with: s = [" + s + "]");
-    // 1.去除首尾以及中间多余空格
-    StringBuilder sb = removeSpace(s);
-    // 2.反转整个字符串
-    reverseString(sb, 0, sb.length() - 1);
-    // 3.反转各个单词
-    reverseEachWord(sb);
-    return sb.toString();
-}
-
-private StringBuilder removeSpace(String s) {
-    // System.out.println("ReverseWords.removeSpace() called with: s = [" + s + "]");
-    int start = 0;
-    int end = s.length() - 1;
-    while (s.charAt(start) == ' ') start++;
-    while (s.charAt(end) == ' ') end--;
-    StringBuilder sb = new StringBuilder();
-    while (start <= end) {
-        char c = s.charAt(start);
-        if (c != ' ' || sb.charAt(sb.length() - 1) != ' ') {
-            sb.append(c);
-        }
-        start++;
+class Solution {
+    public String reverseWords(String s) {
+        // System.out.println("ReverseWords.reverseWords2() called with: s = [" + s + "]");
+        // 1.去除首尾以及中间多余空格
+        StringBuilder sb = removeSpace(s);
+        // 2.反转整个字符串
+        reverseString(sb, 0, sb.length() - 1);
+        // 3.反转各个单词
+        reverseEachWord(sb);
+        return sb.toString();
     }
-    // System.out.println("ReverseWords.removeSpace returned: sb = [" + sb + "]");
-    return sb;
-}
 
-/**
- * 反转字符串指定区间[start, end]的字符
- */
-public void reverseString(StringBuilder sb, int start, int end) {
-    // System.out.println("ReverseWords.reverseString() called with: sb = [" + sb + "], start = [" + start + "], end = [" + end + "]");
-    while (start < end) {
-        char temp = sb.charAt(start);
-        sb.setCharAt(start, sb.charAt(end));
-        sb.setCharAt(end, temp);
-        start++;
-        end--;
-    }
-    // System.out.println("ReverseWords.reverseString returned: sb = [" + sb + "]");
-}
-
-private void reverseEachWord(StringBuilder sb) {
-    int start = 0;
-    int end = 1;
-    int n = sb.length();
-    while (start < n) {
-        while (end < n && sb.charAt(end) != ' ') {
-            end++;
+    private StringBuilder removeSpace(String s) {
+        // System.out.println("ReverseWords.removeSpace() called with: s = [" + s + "]");
+        int start = 0;
+        int end = s.length() - 1;
+        while (s.charAt(start) == ' ') start++;
+        while (s.charAt(end) == ' ') end--;
+        StringBuilder sb = new StringBuilder();
+        while (start <= end) {
+            char c = s.charAt(start);
+            if (c != ' ' || sb.charAt(sb.length() - 1) != ' ') {
+                sb.append(c);
+            }
+            start++;
         }
-        reverseString(sb, start, end - 1);
-        start = end + 1;
-        end = start + 1;
+        // System.out.println("ReverseWords.removeSpace returned: sb = [" + sb + "]");
+        return sb;
+    }
+
+    /**
+     * 反转字符串指定区间[start, end]的字符
+     */
+    public void reverseString(StringBuilder sb, int start, int end) {
+        // System.out.println("ReverseWords.reverseString() called with: sb = [" + sb + "], start = [" + start + "], end = [" + end + "]");
+        while (start < end) {
+            char temp = sb.charAt(start);
+            sb.setCharAt(start, sb.charAt(end));
+            sb.setCharAt(end, temp);
+            start++;
+            end--;
+        }
+        // System.out.println("ReverseWords.reverseString returned: sb = [" + sb + "]");
+    }
+
+    private void reverseEachWord(StringBuilder sb) {
+        int start = 0;
+        int end = 1;
+        int n = sb.length();
+        while (start < n) {
+            while (end < n && sb.charAt(end) != ' ') {
+                end++;
+            }
+            reverseString(sb, start, end - 1);
+            start = end + 1;
+            end = start + 1;
+        }
     }
 }
 ```
 ## 459 重复的子字符串 easy
 可以用kmp算法，但比较复杂，直接归纳出特性然后判断
 ```java
-public boolean repeatedSubstringPattern(String s) {
-    return (s + s).indexOf(s, 1) != s.length();
+class Solution {
+    public boolean repeatedSubstringPattern(String s) {
+        return (s + s).indexOf(s, 1) != s.length();
+    }
 }
 ```
 
@@ -665,98 +746,108 @@ class MyStack {
 ```
 ## 20 有效的括号 easy
 ```java
-public boolean isValid(String s) {
-    Stack<Character> stack = new Stack<>();
-    for (Character c : s.toCharArray()) {
-        if (c.equals('(') || c.equals('[') || c.equals('{')) stack.push(c);
-        else {
-            if (stack.isEmpty()) return false;
-            Character top = stack.pop();
-            if (c.equals(')') && !top.equals('(')) return false;
-            if (c.equals(']') && !top.equals('[')) return false;
-            if (c.equals('}') && !top.equals('{')) return false;
+class Solution {
+    public boolean isValid(String s) {
+        Stack<Character> stack = new Stack<>();
+        for (Character c : s.toCharArray()) {
+            if (c.equals('(') || c.equals('[') || c.equals('{')) stack.push(c);
+            else {
+                if (stack.isEmpty()) return false;
+                Character top = stack.pop();
+                if (c.equals(')') && !top.equals('(')) return false;
+                if (c.equals(']') && !top.equals('[')) return false;
+                if (c.equals('}') && !top.equals('{')) return false;
+            }
         }
+        return stack.isEmpty();
     }
-    return stack.isEmpty();
 }
 ```
 ## 1047 删除字符串中的所有相邻重复项 easy
 ```java
-public String removeDuplicates(String s) {
-    Deque<Character> stack = new ArrayDeque<>();
-    String result = "";
-    for (Character c : s.toCharArray()) {
+class Solution {
+    public String removeDuplicates(String s) {
+        Deque<Character> stack = new ArrayDeque<>();
+        String result = "";
+        for (Character c : s.toCharArray()) {
             if (!stack.isEmpty() && stack.peek().equals(c)) stack.pop();
             else stack.push(c);
+        }
+        while (!stack.isEmpty()) {
+            result += stack.removeLast();
+        }
+        return result;
     }
-    while (!stack.isEmpty()) {
-        result += stack.removeLast();
-    }
-    return result;
 }
 ```
 ## 150 逆波兰表达式 middle
 即后缀表达式，二叉树的后序遍历
 ```java
-public int evalRPN(String[] tokens) {
-    Deque<String> stack = new ArrayDeque<>();
-    Map<String, BiFunction<Integer, Integer, Integer>> map = new HashMap<>();
-    map.put("+", (x, y) -> x + y);
-    map.put("-", (x, y) -> x - y);
-    map.put("*", (x, y) -> x * y);
-    map.put("/", (x, y) -> x / y);
-    for (String token : tokens) {
-        if (!map.containsKey(token)) stack.push(token);
-        else {
-            Integer y = Integer.valueOf(stack.pop());
-            Integer x = Integer.valueOf(stack.pop());
-            stack.push(String.valueOf(map.get(token).apply(x, y)));
+class Solution {
+    public int evalRPN(String[] tokens) {
+        Deque<String> stack = new ArrayDeque<>();
+        Map<String, BiFunction<Integer, Integer, Integer>> map = new HashMap<>();
+        map.put("+", (x, y) -> x + y);
+        map.put("-", (x, y) -> x - y);
+        map.put("*", (x, y) -> x * y);
+        map.put("/", (x, y) -> x / y);
+        for (String token : tokens) {
+            if (!map.containsKey(token)) stack.push(token);
+            else {
+                Integer y = Integer.valueOf(stack.pop());
+                Integer x = Integer.valueOf(stack.pop());
+                stack.push(String.valueOf(map.get(token).apply(x, y)));
+            }
         }
+        return Integer.valueOf(stack.pop());
     }
-    return Integer.valueOf(stack.pop());
 }
 ```
 ## 239 滑动窗口最大值 hard
-使用优先级队列最大堆可以解决，元素是数组值、下标结构，堆顶元素即为当前堆的最大值，先初始化第一个窗口的值，再加入新的值到队列，循环判断当前堆顶元素这是否在窗口中，在则直接返回，不在则删除堆顶元素。其实还能用双端队列，但比较难理解
+思路：使用优先级队列最大堆可以解决，元素是数组值、下标结构，堆顶元素即为当前堆的最大值，先初始化第一个窗口的值，再加入新的值到队列，循环判断当前堆顶元素这是否在窗口中，不在则删除堆顶元素，然后此时的栈顶元素即当前窗口的最大值
 ```java
-public int[] maxSlidingWindow(int[] nums, int k) {
-    Queue<int[]> queue = new PriorityQueue<>((p1, p2) -> p1[0] == p2[0] ? p2[1] - p1[1] : p2[0] - p1[0]);
-    int[] res = new int[nums.length - k + 1];
-    int index = 0;
-    for (int i = 0; i < k; i++) {
-        queue.offer(new int[]{nums[i], i});
+class Solution {
+    public int[] maxSlidingWindow(int[] nums, int k) {
+        Queue<int[]> queue = new PriorityQueue<>((p1, p2) -> p1[0] == p2[0] ? p2[1] - p1[1] : p2[0] - p1[0]);
+        for (int i = 0; i < k; i++) {
+            queue.offer(new int[]{nums[i], i});
+        }
+        int[] result = new int[nums.length - k + 1];
+        int index = 0;
+        result[0] = queue.peek()[0];
+        for (int i = k; i < nums.length; i++) {
+            queue.offer(new int[]{nums[i], i});
+            while (queue.peek()[1] < i - k + 1) queue.poll();
+            result[++index] = queue.peek()[0];
+        }
+        return result;
     }
-    res[index] = queue.peek()[0];
-    for (int i = k; i < nums.length; i++) {
-        queue.offer(new int[]{nums[i], i});
-        while (queue.peek()[1] < i - k + 1) queue.poll();
-        res[++index] = Math.max(nums[i], queue.peek()[0]);
-    }
-    return res;
 }
 ```
 ## 347 前k个高频元素 middle
-使用最小堆解决，元素是一个Map.Entry，键是数组值，值是出现次数
+思路：最小堆PriorityQueue，先统计出所有元素的次数，然后依次加到堆里，入堆前先判断堆的元素个数是否小于k，若小于则直接入堆，不小于则判断若堆顶元素小于要加的元素就先抛出堆顶元素再入堆
 ```java
-public int[] topKFrequent(int[] nums, int k) {
-    Queue<Map.Entry<Integer, Integer>> queue = new PriorityQueue<>((p1, p2) -> p1.getValue() - p2.getValue());
-    Map<Integer, Integer> map = new HashMap<>();
-    int[] res = new int[k];
-    int index = 0;
-    for (int num : nums) {
-        map.put(num, map.getOrDefault(num, 0) + 1);
-    }
-    for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
-        if (queue.size() < k) queue.offer(entry);
-        else if (entry.getValue() > queue.peek().getValue()) {
-            queue.poll();
-            queue.offer(entry);
+class Solution {
+    public int[] topKFrequent(int[] nums, int k) {
+        Queue<Map.Entry<Integer, Integer>> queue = new PriorityQueue<>((p1, p2) -> p1.getValue() - p2.getValue());
+        Map<Integer, Integer> map = new HashMap<>();
+        int[] result = new int[k];
+
+        for (int i: nums) {
+            map.put(i, map.getOrDefault(i, 0) + 1);
         }
+        for (Map.Entry<Integer, Integer> entry: map.entrySet()) {
+            if (queue.size() < k) queue.offer(entry);
+            else if (queue.peek().getValue() < entry.getValue()) {
+                queue.poll();
+                queue.offer(entry);
+            }
+        }
+        for (int i = 0; i < k; i++) {
+            result[i] = queue.poll().getKey();
+        }
+        return result;
     }
-    for (int i = 0; i < k; i++) {
-        res[index++] = queue.poll().getKey();
-    }
-    return res;
 }
 ```
 # 递归
@@ -778,19 +869,21 @@ class Solution {
     }
 }
 //迭代 中右左，因为栈是先进后出
-public List<Integer> preorderTraversal(TreeNode root) {
-    List<Integer> result = new ArrayList<>();
-    Stack<TreeNode> stack = new Stack<>();
-    TreeNode node;
-    stack.push(root);
-    while (!stack.isEmpty()) {
-        node = stack.pop();
-        if (node != null) result.add(node.val);
-        else continue;
-        stack.push(node.right);
-        stack.push(node.left);
+class Solution {
+    public List<Integer> preorderTraversal(TreeNode root) {
+        List<Integer> result = new ArrayList<>();
+        Stack<TreeNode> stack = new Stack<>();
+        TreeNode node;
+        stack.push(root);
+        while (!stack.isEmpty()) {
+            node = stack.pop();
+            if (node != null) result.add(node.val);
+            else continue;
+            stack.push(node.right);
+            stack.push(node.left);
+        }
+        return result;
     }
-    return result;
 }
 ```
 ## 145 二叉树的前序遍历 easy
