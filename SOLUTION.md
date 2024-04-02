@@ -2,18 +2,45 @@
 ## 27 移除元素 easy
 快慢指针，快指针指向要保留的元素值，慢指针指向删除元素后的数组的索引。快指针是读指针，慢指针是写指针
 ```java
-public int removeElement(int[] nums, int val) {
-    //双指针
-    int fast = 0, slow = 0;
-    while (fast < nums.length) {
-        if (nums[fast] != val) {
-            nums[slow++] = nums[fast];
+class Solution {
+    public int removeElement(int[] nums, int val) {
+        //双指针
+        int fast = 0, slow = 0;
+        while (fast < nums.length) {
+            if (nums[fast] != val) {
+                nums[slow++] = nums[fast];
+            }
+            fast++;
         }
-        fast++;
+        return slow;
     }
-    return slow;
 }
 ```
+## 283 移动零 easy
+```
+给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
+请注意 ，必须在不复制数组的情况下原地对数组进行操作。
+```
+思路：快慢指针，慢指针指向当前已经处理好的序列的尾部，快指针指向待处理序列的头部。快指针不断向右移动，每次快指针指向非零数，则将快慢指针对应的数交换，同时慢指针右移。
+- 慢指针左边均为非零数
+- 快指针左边直到慢指针处均为零
+```java
+class Solution {
+    public void moveZeroes(int[] nums) {
+        int fast = 0, slow = 0, temp;
+        while (fast < nums.length) {
+            if (nums[fast] != 0) {
+                temp = nums[fast];
+                nums[fast] = nums[slow];
+                nums[slow] = temp;
+                slow++;
+            }
+            fast++;
+        }
+    }
+}
+```
+
 ## 977 有序数组的平方 easy 
 双指针，选较大的那个值逆序放到结果集并移动相应的指针
 ```java
@@ -549,6 +576,74 @@ class Solution {
     }
 }
 ```
+## 49 字母异位词分组 middle
+```
+给你一个字符串数组，请你将 字母异位词 组合在一起。可以按任意顺序返回结果列表。
+
+字母异位词 是由重新排列源单词的所有字母得到的一个新单词。
+```
+思路：使用HashMap作为哈希表。由于互为字母异位词的两个字符串包含的字母相同，因此对两个字符串分别进行排序之后得到的字符串一定是相同的，故可以将排序之后的字符串作为哈希表的键。若调用242判断两字串异位词的方法，需要两两相比较，效率很低触发超时
+```java
+class Solution {
+    public List<List<String>> groupAnagrams(String[] strs) {
+        Map<String, List<String>> map = new HashMap<String, List<String>>();
+        for (String str : strs) {
+            char[] array = str.toCharArray();
+            Arrays.sort(array);
+            String key = new String(array);
+            List<String> list = map.getOrDefault(key, new ArrayList<String>());
+            list.add(str);
+            map.put(key, list);
+        }
+        return new ArrayList<List<String>>(map.values());
+    }
+}
+```
+## 128 最长连续序列 middle
+```
+给定一个未排序的整数数组 nums ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。
+请你设计并实现时间复杂度为 O(n) 的算法解决此问题。
+```
+思路：
+- 第一种是哈希表，连续序列的起点即前一个数不存在于哈希表，当循环遍历到后一个数不存在于哈希表时，即到达了此连续序列的终点
+- 第二种是排序加遍历（这是自己直接想到的，但排序的时间复杂度是O(N*logN)）
+```java
+//哈希表
+class Solution {
+    public int longestConsecutive(int[] nums) {
+        int res = 0;    // 记录最长连续序列的长度
+        Set<Integer> numSet = new HashSet<>();  // 记录所有的数值
+        for(int num: nums){
+            numSet.add(num);    // 将数组中的值加入哈希表中
+        }
+        int seqLen;     // 连续序列的长度
+        for(int num: numSet){
+            // 如果当前的数是一个连续序列的起点，统计这个连续序列的长度
+            if(!numSet.contains(num - 1)){
+                seqLen = 1;
+                while(numSet.contains(++num))seqLen++;  // 不断查找连续序列，直到num的下一个数不存在于数组中
+                res = Math.max(res, seqLen);    // 更新最长连续序列长度
+            }
+        }
+        return res;
+    }
+}
+//排序后依次遍历比较前一个元素，若相等则跳过，多了1则更新临时结果，其他情况则重置临时结果为1，然后比较当前的临时结果与真正结果取最大值
+class Solution {
+    public int longestConsecutive(int[] nums) {
+        if (nums.length < 2) return nums.length;
+        Arrays.sort(nums);
+        int result = 1, temp = 1;
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] == nums[i - 1]) continue;
+            if (nums[i] - nums[i - 1] == 1) temp++;
+            else temp = 1;
+            result = Math.max(result, temp);
+        }
+        return result;
+    }
+}
+```
 
 # 字符串
 ## 344 反转字符串 easy 
@@ -886,50 +981,54 @@ class Solution {
     }
 }
 ```
-## 145 二叉树的前序遍历 easy
+## 145 二叉树的后序遍历 easy
 若用迭代栈，后序遍历是先中左右再双指针进行翻转
 ```java
-public List<Integer> postorderTraversal(TreeNode root) {
-    List<Integer> result = new ArrayList<>();
-    Stack<TreeNode> stack = new Stack<>();
-    TreeNode node;
-    stack.push(root);
-    while (!stack.isEmpty()) {
-        node = stack.pop();
-        if (node != null) result.add(node.val);
-        else continue;
-        stack.push(node.left);
-        stack.push(node.right);
+class Solution {
+    public List<Integer> postorderTraversal(TreeNode root) {
+        List<Integer> result = new ArrayList<>();
+        Stack<TreeNode> stack = new Stack<>();
+        TreeNode node;
+        stack.push(root);
+        while (!stack.isEmpty()) {
+            node = stack.pop();
+            if (node != null) result.add(node.val);
+            else continue;
+            stack.push(node.left);
+            stack.push(node.right);
+        }
+        int left = 0, right = result.size() - 1;
+        while (left <= right) {
+            int temp = result.get(left);
+            result.set(left, result.get(right));
+            result.set(right, temp);
+            left++;
+            right--;
+        }
+        return result;
     }
-    int left = 0, right = result.size() - 1;
-    while (left <= right) {
-        int temp = result.get(left);
-        result.set(left, result.get(right));
-        result.set(right, temp);
-        left++;
-        right--;
-    }
-    return result;
 }
 ```
 ## 95 二叉树的中序遍历 easy
-若用迭代，循环迭代左侧节点入栈，直到无左侧节点时将当前节点定位到栈的顶端元素即父节点，将其出栈，再将当前节点定位到右孩子节点。直到栈无元素或当前节点为空
+若用迭代，循环迭代左侧节点入栈，直到无左侧节点时将当前节点定位到栈的顶端元素即父节点，将其出栈，再将当前节点定位到右孩子节点。直到栈无元素且当前节点为空
 ```java
-public List<Integer> inorderTraversal(TreeNode root) {
-    List<Integer> result = new ArrayList<>();
-    Stack<TreeNode> stack = new Stack<>();
-    TreeNode cur = root;
-    while (cur != null || !stack.isEmpty()){
-       if (cur != null){
-           stack.push(cur);
-           cur = cur.left;
-       }else{
-           cur = stack.pop();
-           result.add(cur.val);
-           cur = cur.right;
-       }
+class Solution {
+    public List<Integer> inorderTraversal(TreeNode root) {
+        List<Integer> result = new ArrayList<>();
+        Stack<TreeNode> stack = new Stack<>();
+        TreeNode cur = root;
+        while (cur != null || !stack.isEmpty()){
+            if (cur != null){
+                stack.push(cur);
+                cur = cur.left;
+            }else{
+                cur = stack.pop();
+                result.add(cur.val);
+                cur = cur.right;
+            }
+        }
+        return result;
     }
-    return result;
 }
 ```
 ## 102 二叉树的层序遍历 middle
