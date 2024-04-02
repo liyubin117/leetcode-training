@@ -44,77 +44,73 @@ class Solution {
 ## 977 有序数组的平方 easy 
 双指针，选较大的那个值逆序放到结果集并移动相应的指针
 ```java
-public int[] sortedSquares(int[] nums) {
-    int[] result = new int[nums.length];
-    int k = nums.length - 1;
-    for (int l = 0, r = nums.length - 1; l <= r;) {
-        int a = nums[l] * nums[l], b = nums[r] * nums[r];
-        if (a > b) {
-            result[k] = a;
-            l++;
+class Solution {
+    public int[] sortedSquares(int[] nums) {
+        int[] result = new int[nums.length];
+        int k = nums.length - 1;
+        for (int l = 0, r = nums.length - 1; l <= r;) {
+            int a = nums[l] * nums[l], b = nums[r] * nums[r];
+            if (a > b) {
+                result[k] = a;
+                l++;
+            }
+            else {
+                result[k] = b;
+                r--;
+            }
+            k--;
         }
-        else {
-            result[k] = b;
-            r--;
-        }
-        k--;
+        return result;
     }
-    return result;
 }
 ```
-## 209 长度最小的子数组 middle 
-滑动窗口，注意end是窗口的终止位置。具体：每一轮迭代，将 nums[end] 加到 sum ，如果 sum >= s ，则更新子数组的最小长度（此时子数组的长度是 end−start+1），然后将 nums[start] 从 sum 中减去并将 start 右移，直到 sum<s，在此过程中同样更新子数组的最小长度。在每一轮迭代的最后，将 end 右移。
+## 54 螺旋矩阵 middle
+```
+给你一个 m 行 n 列的矩阵 matrix ，请按照 顺时针螺旋顺序 ，返回矩阵中的所有元素。
+```
+思路：边界是left right top bottom，i代表横边，j代表纵边，每次迭代完一边后判断是否越界
 ```java
-public int minSubArrayLen(int target, int[] nums) {
-    int begin = 0, end = 0, sum = 0, result = Integer.MAX_VALUE;
-    for(; end < nums.length; end++) {
-        sum += nums[end];
-        while (sum >= target) {
-            result = Math.min(result, end - begin + 1);
-            sum -= nums[begin++];
+class Solution {
+    public List<Integer> spiralOrder(int[][] matrix) {
+        int m = matrix.length, n = matrix[0].length;
+        List<Integer> result = new ArrayList<>();
+        int left = 0, right = n - 1, top = 0, bottom = m - 1;
+        while (true) {
+            for (int j = left; j <= right; j++) result.add(matrix[top][j]);
+            if(++top > bottom) break;
+            for (int i = top; i <= bottom; i++) result.add(matrix[i][right]);
+            if(--right < left) break;
+            for (int j = right; j >= left; j--) result.add(matrix[bottom][j]);
+            if(--bottom < top) break;
+            for (int i = bottom; i >= top; i--) result.add(matrix[i][left]);
+            if(++left > right) break;
         }
+        return result;
     }
-    return result == Integer.MAX_VALUE ? 0 : result;
 }
 ```
 ## 59 螺旋矩阵2 middle 
-边界是left right top bottom，i代表横边，j代表纵边，循环到n*n次赋值结束
+思路：边界是left right top bottom，i代表横边，j代表纵边，每次迭代完一边后判断是否越界
 ```java
 class Solution {
     public int[][] generateMatrix(int n) {
-        int left = 0, right = n - 1, top = 0, bottom = n - 1;
-        int count = 1, target = n * n;
-        int[][] res = new int[n][n];
-        //for循环中变量定义成i或j的细节：按照通常的思维，i代表行，j代表列
-        //这样，就可以很容易区分出来变化的量应该放在[][]的第一个还是第二个
-        //对于变量的边界怎么定义：
-        //从左向右填充：填充的列肯定在[left,right]区间
-        //从上向下填充：填充的行肯定在[top,bottom]区间
-        //从右向左填充：填充的列肯定在[right,left]区间
-        //从下向上填充：填充的行肯定在[bootom,top]区间
-        //通过上面的总结会发现边界的起始和结束与方向是对应的
-        while (count <= target) {
-            //从左到右填充，相当于缩小上边界
-            for (int j = left; j <= right; j++) res[top][j] = count++;
-            //缩小上边界
-            top++;
-            //从上向下填充，相当于缩小右边界
-            for (int i = top; i <= bottom; i++) res[i][right] = count++;
-            //缩小右边界
-            right--;
-            //从右向左填充，相当于缩小下边界
-            for (int j = right; j >= left; j--) res[bottom][j] = count++;
-            //缩小下边界
-            bottom--;
-            //从下向上填充，相当于缩小左边界
-            for (int i = bottom; i >= top; i--) res[i][left] = count++;
-            //缩小左边界
-            left++;
+        int left = 0, right = n - 1, top = 0, bottom = n - 1, count = 1;
+        int[][] result = new int[n][n];
+        while (true) {
+            for (int j = left; j <= right; j++) result[top][j] = count++;
+            if(++top > bottom) break;
+            for (int i = top; i <= bottom; i++) result[i][right] = count++;
+            if(--right < left) break;
+            for (int j = right; j >= left; j--) result[bottom][j] = count++;
+            if(--bottom < top) break;
+            for (int i = bottom; i >= top; i--) result[i][left] = count++;
+            if(++left > right) break;
         }
-        return res;
+        return result;
     }
 }
 ```
+
 ## 15 三数之和且不可出现重复三元组 middle 
 先排序，固定一个点i后双指针left/right，再移动这个点，要注意去重
 ```java
@@ -125,9 +121,9 @@ class Solution {
         for (int i = 0; i < nums.length; i++) {
             if (nums[i] > 0) break; // 排序之后如果第一个元素已经大于零，那么无论如何组合都不可能凑成三元组，直接返回结果就可以了
             if (i > 0 && nums[i] == nums[i - 1]) continue; //去重a
-            int left = i + 1, right = nums.length - 1;
+            int left = i + 1, right = nums.length - 1, tmp;
             while (left < right) {
-                int tmp = nums[i] + nums[left] + nums[right];
+                tmp = nums[i] + nums[left] + nums[right];
                 if (tmp < 0) left++;
                 else if (tmp > 0) right--;
                 else {
@@ -172,6 +168,93 @@ class Solution {
             }
         }
         return result;
+    }
+}
+```
+## 11 盛最多水的容器 middle
+```
+给定一个长度为 n 的整数数组 height 。有 n 条垂线，第 i 条线的两个端点是 (i, 0) 和 (i, height[i]) 。
+找出其中的两条线，使得它们与 x 轴共同构成的容器可以容纳最多的水。
+返回容器可以储存的最大水量。
+说明：你不能倾斜容器。
+```
+思路：双指针
+
+在每个状态下，无论长板或短板向中间收窄一格，都会导致水槽 底边宽度 −1 变短：
+- 若向内 移动短板 ，水槽的短板 min(h[i],h[j]) 可能变大，因此下个水槽的面积 可能增大 。
+- 若向内 移动长板 ，水槽的短板 min(h[i],h[j]) 不变或变小，因此下个水槽的面积 一定变小 。
+
+因此，初始化双指针分列水槽左右两端，循环每轮将短板向内移动一格，并更新面积最大值，直到两指针相遇时跳出；即可获得最大面积。
+```java
+class Solution {
+    public int maxArea(int[] height) {
+        int l = 0, r = height.length - 1, result = 0;
+        while (l < r) {
+            result = Math.max(result, (r - l) * (height[l] < height[r] ? height[l++] : height[r--]));
+        }
+        return result;
+    }
+}
+```
+## 42 接雨水 hard
+```
+给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
+```
+思路：双指针，分别指向左右两端，且需要两个值记录左、右边的最大高度，最大高度低的那边的指针可以决定能接多少水，接的量是最大高度-当前列的高度
+```java
+class Solution {
+    public int trap(int[] height) {
+        int n = height.length;
+        int res = 0;
+        // 左右指针：分别指向左右两边界的列
+        int left = 0, right = n - 1;
+        // 左指针的左边（包括）最大高度、右指针的右边（包括）最大高度
+        int leftMax = height[left], rightMax = height[right];
+        // 最两边的列存不了水
+        left++;
+        right--;
+        // 向中间靠拢
+        while(left <= right){
+            leftMax = Math.max(leftMax, height[left]);
+            rightMax = Math.max(rightMax, height[right]);
+            if(leftMax < rightMax){
+                // 左指针的leftMax比右指针的rightMax矮，说明：左指针的右边至少有一个板子 > 左指针左边所有板子。根据水桶效应，保证了左指针当前列的水量决定权在左边
+                // 那么可以计算左指针当前列的水量：左边最大高度-当前列高度
+                res += leftMax - height[left];
+                left++;
+            }else{
+                // 右边同理
+                res += rightMax - height[right];
+                right--;
+            }
+        }
+        return res;
+    }
+}
+```
+## 73 矩阵置零 middle
+```
+给定一个 m x n 的矩阵，如果一个元素为 0 ，则将其所在行和列的所有元素都设为 0 。请使用 原地 算法。
+```
+思路：用两个标记数组分别记录每一行和每一列是否有零出现，首先遍历该数组一次，如果某个元素为 0，那么就将该元素所在的行和列所对应标记数组的位置置为 true。最后我们再次遍历该数组，用标记数组更新原数组即可
+```java
+class Solution {
+    public void setZeroes(int[][] matrix) {
+        int m = matrix.length, n = matrix[0].length;
+        boolean[] rows = new boolean[m], cols = new boolean[n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (matrix[i][j] == 0) {
+                    rows[i] = true;
+                    cols[j] = true;
+                }
+            }
+        }
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (rows[i] || cols[j]) matrix[i][j] = 0;
+            }
+        }
     }
 }
 ```
@@ -280,6 +363,46 @@ class Solution {
         // 此时 slowIndex 的位置就是待删除元素的前一个位置。
         slowIndex.next = slowIndex.next.next;
         return dummyNode.next;
+    }
+}
+```
+## 141 环形链表 easy
+思路：快慢指针
+```java
+public class Solution {
+    public boolean hasCycle(ListNode head) {
+        ListNode slow = head, fast = head;
+        while (fast != null && fast.next != null) {
+            fast = fast.next.next;
+            slow = slow.next;
+            if (slow == fast) return true;
+        }
+        return false;
+    }
+}
+```
+## 142 环形链表2 middle
+```
+给定一个链表的头节点  head ，返回链表开始入环的第一个节点。 如果链表无环，则返回 null。
+```
+思路：快指针两步，慢指针一步，相遇后说明有环，再置慢指针为头结点，快慢指针每次移动一步，相遇点即环的起始点
+```java
+public class Solution {
+    public ListNode detectCycle(ListNode head) {
+        ListNode slow = head, fast = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+            if (slow == fast) {// 有环
+               slow = head;
+               while (slow != fast) {
+                    slow = slow.next;
+                    fast = fast.next;
+               }
+               return slow;
+            }
+        }
+        return null;
     }
 }
 ```
@@ -644,6 +767,27 @@ class Solution {
     }
 }
 ```
+## 75 颜色分类 middle
+```
+给定一个包含红色、白色和蓝色、共 n 个元素的数组 nums ，原地对它们进行排序，使得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
+我们使用整数 0、 1 和 2 分别表示红色、白色和蓝色。
+必须在不使用库内置的 sort 函数的情况下解决这个问题。
+```
+思路：由于解空间有限，只有0 1 2，因为用数组作为哈希表，键是元素值，值是出现的次数，然后遍历此哈希表赋值原数组
+```java
+class Solution {
+    public void sortColors(int[] nums) {
+        int[] hash = new int[3];
+        for (int num: nums) {
+            hash[num]++;
+        }
+        int index = 0;
+        for (int i = 0; i < 3; i++) {
+            while (hash[i]-- > 0) nums[index++] = i;
+        }
+    }
+}
+```
 
 # 字符串
 ## 344 反转字符串 easy 
@@ -945,6 +1089,97 @@ class Solution {
     }
 }
 ```
+
+# 滑动窗口
+<img src="https://pic.leetcode-cn.com/1601027592-GJTzPP-file_1601027592222"/>滑动窗口口诀</img>
+## 3. 无重复字符的最长子串 middle
+```
+给定一个字符串 s ，请你找出其中不含有重复字符的最长子串的长度。
+```
+思路：使用滑动窗口
+```java
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        // 哈希集合，记录每个字符是否出现过
+        Set<Character> hash = new HashSet<Character>();
+        int n = s.length();
+        // 右指针，初始值为 -1，相当于我们在字符串的左边界的左侧，还没有开始移动
+        int end = -1, result = 0;
+        for (int begin = 0; begin < n; begin++) {
+            if (begin != 0) { // 当左指针不是指向第1个元素时，说明此时已经迭代过一次，发生窗口滑动，哈希表移除前一个字符
+                hash.remove(s.charAt(begin - 1));
+            }
+            while (end + 1 < n && !hash.contains(s.charAt(end + 1))) { //之所以是end + 1是因为窗口向右滑动时，此前的end也加1
+                // 不断地移动右指针
+                hash.add(s.charAt(end + 1));
+                ++end;
+            }
+            // 第 begin 到 end 个字符是一个无重复字符子串
+            result = Math.max(result, end - begin + 1);
+        }
+        return result;
+    }
+}
+```
+## 209 长度最小的子数组 middle
+滑动窗口，注意end是窗口的终止位置。具体：每一轮迭代，将 nums[end] 加到 sum ，如果 sum >= s ，则更新子数组的最小长度（此时子数组的长度是 end−start+1），然后将 nums[start] 从 sum 中减去并将 start 右移，直到 sum<s，在此过程中同样更新子数组的最小长度。在每一轮迭代的最后，将 end 右移。
+```java
+class Solution {
+    public int minSubArrayLen(int target, int[] nums) {
+        int begin = 0, end = 0, sum = 0, result = Integer.MAX_VALUE;
+        for(; end < nums.length; end++) {
+            sum += nums[end];
+            while (sum >= target) {
+                result = Math.min(result, end - begin + 1);
+                sum -= nums[begin++];
+            }
+        }
+        return result == Integer.MAX_VALUE ? 0 : result;
+    }
+}
+```
+## 438 找到字符串中所有字母异位词 middle
+```
+给定两个字符串 s 和 p，找到 s 中所有 p 的 异位词 的子串，返回这些子串的起始索引。不考虑答案输出的顺序。
+
+异位词 指由相同字母重排列形成的字符串（包括相同的字符串）。
+```
+思路：哈希表+滑动窗口，由于要找异位词，滑动窗口长度必然是p字串的长度
+```java
+class Solution {
+    public List<Integer> findAnagrams(String s, String p) {
+        int sLen = s.length(), pLen = p.length();
+
+        if (sLen < pLen) {
+            return new ArrayList<Integer>();
+        }
+
+        List<Integer> ans = new ArrayList<Integer>();
+        int[] sCount = new int[26];
+        int[] pCount = new int[26];
+        for (int i = 0; i < pLen; ++i) {
+            ++sCount[s.charAt(i) - 'a'];
+            ++pCount[p.charAt(i) - 'a'];
+        }
+
+        if (Arrays.equals(sCount, pCount)) { //比较第1个窗口：若一样，说明已经找到了第一个异位词，索引是0
+            ans.add(0);
+        }
+
+        for (int i = 0; i < sLen - pLen; ++i) {
+            --sCount[s.charAt(i) - 'a']; //右移窗口，移除前一个窗口的首元素
+            ++sCount[s.charAt(i + pLen) - 'a']; //右移窗口，加上前一个窗口的末元素后的元素。因为要找异位词，所以窗口长度必然是pLen
+
+            if (Arrays.equals(sCount, pCount)) { //比较新的窗口，由于此时i代表前一个窗口的首元素，因此这里是i+1
+                ans.add(i + 1);
+            }
+        }
+
+        return ans;
+    }
+}
+```
+
 # 递归
 ## 144 二叉树的前序遍历 easy
 ```java
@@ -1511,6 +1746,77 @@ public List<Integer> lastVisitedIntegers(int[] nums) {
 class Solution {
     public boolean canWinNim(int n) {
         return n % 4 != 0;
+    }
+}
+```
+## 136 只出现一次的数字 easy
+```
+给你一个 非空 整数数组 nums ，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
+你必须设计并实现线性时间复杂度的算法来解决此问题，且该算法只使用常量额外空间。
+```
+思路：任何数与0异或是其本身，任何数与自身异或是0，由于只有一个一次出现的数字，因此所有数字异或后即所需的结果
+```java
+class Solution {
+    public int singleNumber(int[] nums) {
+        int result = 0;
+        for (int num: nums) {
+            result ^= num;
+        }
+        return result;
+    }
+}
+```
+## 169 多数元素 easy
+```
+给定一个大小为 n 的数组 nums ，返回其中的多数元素。多数元素是指在数组中出现次数 大于 ⌊ n/2 ⌋ 的元素。
+你可以假设数组是非空的，并且给定的数组总是存在多数元素。
+```
+思路：排序后中间元素必为所要的结果
+```java
+class Solution {
+    public int majorityElement(int[] nums) {
+        Arrays.sort(nums);
+        return nums[(nums.length - 1) / 2];
+    }
+}
+```
+## 287 寻找重复数 middle
+```
+给定一个包含 n + 1 个整数的数组 nums ，其数字都在 [1, n] 范围内（包括 1 和 n），可知至少存在一个重复的整数。
+假设 nums 只有 一个重复的整数 ，返回 这个重复的数 。
+你设计的解决方案必须 不修改 数组 nums 且只用常量级 O(1) 的额外空间。
+```
+思路：能直接想到的就是使用哈希表解决。但也能用快慢指针找环的交点，时间效率高
+```java
+//快慢指针
+class Solution {
+    public int findDuplicate(int[] nums) {
+        int slow = 0, fast = 0;
+        do {
+            slow = nums[slow];
+            fast = nums[nums[fast]];
+        } while (slow != fast);
+        slow = 0;
+        while (slow != fast) {
+            slow = nums[slow];
+            fast = nums[fast];
+        }
+        return slow;
+    }
+}
+//哈希表
+class Solution {
+    public int findDuplicate(int[] nums) {
+        Set<Integer> hash = new HashSet<>();
+        for (int num: nums) {
+            if (hash.contains(num)) {
+                return num;
+            } else {
+                hash.add(num);
+            }
+        }
+        return -1;
+
     }
 }
 ```

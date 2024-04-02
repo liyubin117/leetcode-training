@@ -2,9 +2,13 @@
 当迭代的次数与输入大小成线性时，O(N)，而迭代次数固定或只有一次则是O(1)
 
 # 二维数组转一维
-a * b 二维数组， [x][y]元素对应的一维数组索引是bx+y
+m * n 二维数组arr[][]
 
-一维索引是m，则对应的x是m/b，y是m%b
+int m = arr.length, n = arr[0].length
+
+[x][y]元素对应的一维数组索引是nx+y
+
+一维索引是i，则对应的x是i/n，y是i%n
 
 # 滑动窗口
 特殊的双指针，常用于数组连续子串问题 209 1456
@@ -246,6 +250,7 @@ m大于等于3，小于等于14，即在蔡勒公式中，某年的1,2月份要�
 * Arrays.sort() 直接对原数组排序，无返回值，归并排序
 * Arrays.binarySearch() 二分查找
 * Arrays.fill(int[], int) 给数组的每个位置赋值指定值
+* Arrays.equals(int[], int[]) 比较两个数组是否值一样
 * Arrays.asList(...) 将一些不定长入参转换成List
 * T[] Arrays.copyOfRange(T[], from, to) 返回一个原数组从包含from到不包含to的数组
 * list.stream().mapToInt(Integer::intValue).toArray() 将一个List<Integer>转换成int[]
