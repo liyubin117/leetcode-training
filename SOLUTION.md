@@ -64,53 +64,6 @@ class Solution {
     }
 }
 ```
-## 54 螺旋矩阵 middle
-```
-给你一个 m 行 n 列的矩阵 matrix ，请按照 顺时针螺旋顺序 ，返回矩阵中的所有元素。
-```
-思路：边界是left right top bottom，i代表横边，j代表纵边，每次迭代完一边后判断是否越界
-```java
-class Solution {
-    public List<Integer> spiralOrder(int[][] matrix) {
-        int m = matrix.length, n = matrix[0].length;
-        List<Integer> result = new ArrayList<>();
-        int left = 0, right = n - 1, top = 0, bottom = m - 1;
-        while (true) {
-            for (int j = left; j <= right; j++) result.add(matrix[top][j]);
-            if(++top > bottom) break;
-            for (int i = top; i <= bottom; i++) result.add(matrix[i][right]);
-            if(--right < left) break;
-            for (int j = right; j >= left; j--) result.add(matrix[bottom][j]);
-            if(--bottom < top) break;
-            for (int i = bottom; i >= top; i--) result.add(matrix[i][left]);
-            if(++left > right) break;
-        }
-        return result;
-    }
-}
-```
-## 59 螺旋矩阵2 middle 
-思路：边界是left right top bottom，i代表横边，j代表纵边，每次迭代完一边后判断是否越界
-```java
-class Solution {
-    public int[][] generateMatrix(int n) {
-        int left = 0, right = n - 1, top = 0, bottom = n - 1, count = 1;
-        int[][] result = new int[n][n];
-        while (true) {
-            for (int j = left; j <= right; j++) result[top][j] = count++;
-            if(++top > bottom) break;
-            for (int i = top; i <= bottom; i++) result[i][right] = count++;
-            if(--right < left) break;
-            for (int j = right; j >= left; j--) result[bottom][j] = count++;
-            if(--bottom < top) break;
-            for (int i = bottom; i >= top; i--) result[i][left] = count++;
-            if(++left > right) break;
-        }
-        return result;
-    }
-}
-```
-
 ## 15 三数之和且不可出现重复三元组 middle 
 先排序，固定一个点i后双指针left/right，再移动这个点，要注意去重
 ```java
@@ -168,6 +121,79 @@ class Solution {
             }
         }
         return result;
+    }
+}
+```
+## 560 和为k的子数组 middle
+```
+给你一个整数数组 nums 和一个整数 k ，请你统计并返回 该数组中和为 k 的子数组的个数 。
+子数组是数组中元素的连续非空序列。
+```
+思路：
+- 暴力枚举，指定start后遍历end，再迭代start
+- 前缀和+哈希表，通过遍历数组，计算每个位置的前缀和，并使用一个哈希表来存储每个前缀和出现的次数。对于任意的两个下标i和j（i < j），如果prefixSum[j] - prefixSum[i] = k，即从第i个位置到第j个位置的元素之和等于k，那么说明从第i+1个位置到第j个位置的连续子数组的和为k，也就是若此前获取的前缀和中包含prefix[j]-k，那就说明以j为结尾的子数组有对应键值的次数符合条件
+```java
+//暴力枚举 O(N^2)
+public class Solution {
+    public int subarraySum(int[] nums, int k) {
+        int count = 0;
+        for (int start = 0; start < nums.length; ++start) {
+            int sum = 0;
+            for (int end = start; end < nums.length; ++end) {
+                sum += nums[end];
+                if (sum == k) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+}
+//前缀和+哈希表，O(N) pre[i]=pre[i−1]+nums[i]
+public class Solution {
+    public int subarraySum(int[] nums, int k) {
+        int count = 0, pre = 0;
+        HashMap < Integer, Integer > hash = new HashMap < > ();
+        hash.put(0, 1);
+        for (int i = 0; i < nums.length; i++) {
+            pre += nums[i];
+            if (hash.containsKey(pre - k)) {
+                count += hash.get(pre - k);
+            }
+            hash.put(pre, hash.getOrDefault(pre, 0) + 1);
+        }
+        return count;
+    }
+}
+```
+## 56 合并区间 middle
+```
+以数组 intervals 表示若干个区间的集合，其中单个区间为 intervals[i] = [starti, endi] 。请你合并所有重叠的区间，并返回 一个不重叠的区间数组，该数组需恰好覆盖输入中的所有区间 。
+```
+思路：将列表中的区间按照左端点升序排序。然后将第一个区间加入 merged 数组中，并按顺序依次考虑之后的每个区间：
+- 如果当前区间的左端点在数组 merged 中最后一个区间的右端点之后，那么它们不会重合，我们可以直接将这个区间加入数组 merged 的末尾；
+- 否则，它们重合，我们需要用当前区间的右端点更新数组 merged 中最后一个区间的右端点，将其置为二者的较大值。
+```java
+class Solution {
+    public int[][] merge(int[][] intervals) {
+        if (intervals.length == 0) {
+            return new int[0][2];
+        }
+        Arrays.sort(intervals, new Comparator<int[]>() {
+            public int compare(int[] interval1, int[] interval2) {
+                return interval1[0] - interval2[0];
+            }
+        });
+        List<int[]> merged = new ArrayList<int[]>();
+        for (int i = 0; i < intervals.length; ++i) {
+            int L = intervals[i][0], R = intervals[i][1];
+            if (merged.size() == 0 || merged.get(merged.size() - 1)[1] < L) {
+                merged.add(new int[]{L, R});
+            } else {
+                merged.get(merged.size() - 1)[1] = Math.max(merged.get(merged.size() - 1)[1], R);
+            }
+        }
+        return merged.toArray(new int[merged.size()][]);
     }
 }
 ```
@@ -232,6 +258,54 @@ class Solution {
     }
 }
 ```
+
+# 矩阵
+## 54 螺旋矩阵 middle
+```
+给你一个 m 行 n 列的矩阵 matrix ，请按照 顺时针螺旋顺序 ，返回矩阵中的所有元素。
+```
+思路：边界是left right top bottom，i代表横边，j代表纵边，每次迭代完一边后判断是否越界
+```java
+class Solution {
+    public List<Integer> spiralOrder(int[][] matrix) {
+        int m = matrix.length, n = matrix[0].length;
+        List<Integer> result = new ArrayList<>();
+        int left = 0, right = n - 1, top = 0, bottom = m - 1;
+        while (true) {
+            for (int j = left; j <= right; j++) result.add(matrix[top][j]);
+            if(++top > bottom) break;
+            for (int i = top; i <= bottom; i++) result.add(matrix[i][right]);
+            if(--right < left) break;
+            for (int j = right; j >= left; j--) result.add(matrix[bottom][j]);
+            if(--bottom < top) break;
+            for (int i = bottom; i >= top; i--) result.add(matrix[i][left]);
+            if(++left > right) break;
+        }
+        return result;
+    }
+}
+```
+## 59 螺旋矩阵2 middle
+思路：边界是left right top bottom，i代表横边，j代表纵边，每次迭代完一边后判断是否越界
+```java
+class Solution {
+    public int[][] generateMatrix(int n) {
+        int left = 0, right = n - 1, top = 0, bottom = n - 1, count = 1;
+        int[][] result = new int[n][n];
+        while (true) {
+            for (int j = left; j <= right; j++) result[top][j] = count++;
+            if(++top > bottom) break;
+            for (int i = top; i <= bottom; i++) result[i][right] = count++;
+            if(--right < left) break;
+            for (int j = right; j >= left; j--) result[bottom][j] = count++;
+            if(--bottom < top) break;
+            for (int i = bottom; i >= top; i--) result[i][left] = count++;
+            if(++left > right) break;
+        }
+        return result;
+    }
+}
+```
 ## 73 矩阵置零 middle
 ```
 给定一个 m x n 的矩阵，如果一个元素为 0 ，则将其所在行和列的所有元素都设为 0 。请使用 原地 算法。
@@ -255,6 +329,66 @@ class Solution {
                 if (rows[i] || cols[j]) matrix[i][j] = 0;
             }
         }
+    }
+}
+```
+## 48 旋转图像 middle
+```
+给定一个 n × n 的二维矩阵 matrix 表示一个图像。请你将图像顺时针旋转 90 度。
+你必须在 原地 旋转图像，这意味着你需要直接修改输入的二维矩阵。请不要 使用另一个矩阵来旋转图像。
+```
+思路：对于矩阵中第 i 行的第 j 个元素，在旋转后，它出现在倒数第 i 列的第 j 个位置，即[j][rows-1-i]。用翻转操作代替旋转操作，先水平翻转，再对角线翻转
+```java
+class Solution {
+    public void rotate(int[][] matrix) {
+        int n = matrix.length;
+        // 水平翻转
+        for (int i = 0; i < n / 2; ++i) {
+            for (int j = 0; j < n; ++j) {
+                int temp = matrix[i][j];
+                matrix[i][j] = matrix[n - i - 1][j];
+                matrix[n - i - 1][j] = temp;
+            }
+        }
+        // 主对角线翻转
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < i; ++j) {
+                int temp = matrix[i][j];
+                matrix[i][j] = matrix[j][i];
+                matrix[j][i] = temp;
+            }
+        }
+    }
+}
+```
+## 240 搜索二维矩阵2 middle
+```
+编写一个高效的算法来搜索 m x n 矩阵 matrix 中的一个目标值 target 。该矩阵具有以下特性：
+每行的元素从左到右升序排列。
+每列的元素从上到下升序排列。
+```
+思路：暴力查找、二分查找或Z形查找，容易理解且效率高的是二分查找
+```java
+//二分查找，为简单可直接调用Arrays.binarySearch
+class Solution {
+    public boolean searchMatrix(int[][] matrix, int target) {
+        for (int[] row: matrix) {
+            if(Arrays.binarySearch(row, target) >= 0) return true;
+        }
+        return false;
+    }
+}
+//z形查找
+class Solution {
+    public boolean searchMatrix(int[][] matrix, int target) {
+        int row = matrix.length - 1;
+        int line = 0;
+        while (row >= 0 && line < matrix[0].length) {
+            if (matrix[row][line] == target) return true;
+            else if (matrix[row][line] > target) row--; // 得减下，向上检索                
+            else line++;
+        }
+        return false;
     }
 }
 ```
@@ -406,6 +540,25 @@ public class Solution {
     }
 }
 ```
+## 234 回文链表 easy
+思路：用栈的方式获取倒序查链表的能力，然后迭代出栈按序与链表进行比较。还可使用递归，比较复杂
+```java
+class Solution {
+    public boolean isPalindrome(ListNode head) {
+        Stack<Integer> stack = new Stack<>();
+        ListNode cur = head;
+        while (cur != null) {
+            stack.push(cur.val);
+            cur = cur.next;
+        }
+        while (!stack.isEmpty()) {
+            if (stack.pop() != head.val) return false;
+            head = head.next;
+        }
+        return true;
+    }
+}
+```
 ## 206 反转链表 easy
 ```java
 class Solution {
@@ -441,6 +594,42 @@ class Solution {
             r--;
         }
         list.get(l).next = null; //此时将实际上的最后一个节点指向null，否则会cycle
+    }
+}
+```
+## 24 两两交换链表中的节点 middle
+思路：
+- 迭代：使用虚拟头节点指向head，cur作为虚拟头节点，cur下个节点指向second，second下个节点指向first，first下个节点指向third（tmp），然后置cur为first即此时的第二个字节
+- 递归：用 head 表示原始链表的头节点，新的链表的第二个节点，用 newHead 表示新的链表的头节点，原始链表的第二个节点，则原始链表中的其余节点的头节点是 newHead.next。令 head.next = swapPairs(newHead.next)，表示将其余节点进行两两交换，交换后的新的头节点为 head 的下一个节点。然后令 newHead.next = head，即完成了所有节点的交换。最后返回新的链表的头节点 newHead
+```java
+//迭代
+class Solution {
+    public ListNode swapPairs(ListNode head) {
+        ListNode dummyHead = new ListNode(-1), first, second, tmp, cur = dummyHead;
+        dummyHead.next = head;
+        while (cur.next != null && cur.next.next != null) {
+            tmp = cur.next.next.next;
+            first = cur.next;
+            second = cur.next.next;
+            
+            cur.next = second;
+            second.next = first;
+            first.next = tmp;
+            cur = first;
+        }
+        return dummyHead.next;
+    }
+}
+//递归
+class Solution {
+    public ListNode swapPairs(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+        ListNode newHead = head.next;
+        head.next = swapPairs(newHead.next);
+        newHead.next = head;
+        return newHead;
     }
 }
 ```
@@ -494,6 +683,14 @@ public class Solution {
 }
 ```
 ## 146 LRU缓存 middle
+```
+请你设计并实现一个满足  LRU (最近最少使用) 缓存 约束的数据结构。
+实现 LRUCache 类：
+LRUCache(int capacity) 以 正整数 作为容量 capacity 初始化 LRU 缓存
+int get(int key) 如果关键字 key 存在于缓存中，则返回关键字的值，否则返回 -1 。
+void put(int key, int value) 如果关键字 key 已经存在，则变更其数据值 value ；如果不存在，则向缓存中插入该组 key-value 。如果插入操作导致关键字数量超过 capacity ，则应该 逐出 最久未使用的关键字。
+函数 get 和 put 必须以 O(1) 的平均时间复杂度运行。
+```
 应该用哈希表+双向链表的解法，更能体现考察的目标。get若有则先将节点移到头部再返回其值，put若无该元素则size+1，增加节点到头部，且若超出限制还删掉尾部节点，若有该元素则更新值并移到头部
 ```java
 //哈希表+双向链表
@@ -544,9 +741,10 @@ public class LRUCache {
             ++size;
             if (size > capacity) {
                 // 如果超出容量，删除双向链表的尾部节点
-                DLinkedNode tail = removeTail();
+                DLinkedNode tailNode = tail.prev;
+                removeNode(tailNode);
                 // 删除哈希表中对应的项
-                cache.remove(tail.key);
+                cache.remove(tailNode.key);
                 --size;
             }
         }
@@ -573,12 +771,6 @@ public class LRUCache {
         removeNode(node);
         addToHead(node);
     }
-
-    private DLinkedNode removeTail() {
-        DLinkedNode res = tail.prev;
-        removeNode(res);
-        return res;
-    }
 }
 //继承内置类LinkedHashMap
 class LRUCache extends LinkedHashMap<Integer, Integer>{
@@ -600,6 +792,28 @@ class LRUCache extends LinkedHashMap<Integer, Integer>{
     @Override
     protected boolean removeEldestEntry(Map.Entry<Integer, Integer> eldest) {
         return size() > capacity;
+    }
+}
+```
+## 21 合并两个有序链表 easy
+```
+将两个升序链表合并为一个新的 升序 链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。 
+```
+思路：递归
+- 终止条件：若某节点为空则返回另一个节点
+- 单层递归：若l1小于l2，l1下一个节点指向(l1.next, l2)两条链表递归后的头结点，返回l1，反之亦然
+```java
+class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        if (l1 == null) return l2;
+        if (l2 == null) return l1;
+        if (l1.val < l2.val) {
+            l1.next = mergeTwoLists(l1.next, l2);
+            return l1;
+        } else {
+            l2.next = mergeTwoLists(l1, l2.next);
+            return l2;
+        }
     }
 }
 ```
@@ -988,14 +1202,13 @@ class MyStack {
 class Solution {
     public boolean isValid(String s) {
         Stack<Character> stack = new Stack<>();
-        for (Character c : s.toCharArray()) {
-            if (c.equals('(') || c.equals('[') || c.equals('{')) stack.push(c);
-            else {
+        for (Character c: s.toCharArray()) {
+            if (c == '(' || c == '[' || c == '{') stack.push(c);
+            else if (c == ')' || c == ']' || c == '}') {
                 if (stack.isEmpty()) return false;
-                Character top = stack.pop();
-                if (c.equals(')') && !top.equals('(')) return false;
-                if (c.equals(']') && !top.equals('[')) return false;
-                if (c.equals('}') && !top.equals('{')) return false;
+                if (c == ')' && stack.pop() != '(') return false;
+                if (c == ']' && stack.pop() != '[') return false;
+                if (c == '}' && stack.pop() != '{') return false;
             }
         }
         return stack.isEmpty();
@@ -1043,6 +1256,10 @@ class Solution {
 }
 ```
 ## 239 滑动窗口最大值 hard
+```
+给你一个整数数组 nums，有一个大小为 k 的滑动窗口从数组的最左侧移动到数组的最右侧。你只可以看到在滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。
+返回 滑动窗口中的最大值 。
+```
 思路：使用优先级队列最大堆可以解决，元素是数组值、下标结构，堆顶元素即为当前堆的最大值，先初始化第一个窗口的值，再加入新的值到队列，循环判断当前堆顶元素这是否在窗口中，不在则删除堆顶元素，然后此时的栈顶元素即当前窗口的最大值
 ```java
 class Solution {
@@ -1091,7 +1308,6 @@ class Solution {
 ```
 
 # 滑动窗口
-<img src="https://pic.leetcode-cn.com/1601027592-GJTzPP-file_1601027592222"/>滑动窗口口诀</img>
 ## 3. 无重复字符的最长子串 middle
 ```
 给定一个字符串 s ，请你找出其中不含有重复字符的最长子串的长度。
@@ -1402,6 +1618,29 @@ class Solution {
         if (leftHeight == -1 || rightHeight == -1 || Math.abs(leftHeight - rightHeight) > 1) return -1;
         int height = Math.max(leftHeight, rightHeight) + 1;
         return height;
+    }
+}
+```
+## 108 将有序数组转换为搜索二叉树 easy
+思路：选择中间位置左边的数字作为根节点，确保中间节点的大小大于左、小于右
+```java
+class Solution {
+    public TreeNode sortedArrayToBST(int[] nums) {
+        return recurse(nums, 0, nums.length - 1);
+    }
+
+    public TreeNode recurse(int[] nums, int left, int right) {
+        if (left > right) {
+            return null;
+        }
+
+        // 总是选择中间位置左边的数字作为根节点
+        int mid = left + (right - left) / 2;
+
+        TreeNode root = new TreeNode(nums[mid]);
+        root.left = recurse(nums, left, mid - 1);
+        root.right = recurse(nums, mid + 1, right);
+        return root;
     }
 }
 ```
