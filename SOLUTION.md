@@ -63,6 +63,62 @@ class Solution {
     }
 }
 ```
+## 34 在排序数组中查找元素的第一个和最后一个位置 middle
+```
+给你一个按照非递减顺序排列的整数数组 nums，和一个目标值 target。请你找出给定目标值在数组中的开始位置和结束位置。
+
+如果数组中不存在目标值 target，返回 [-1, -1]。
+
+你必须设计并实现时间复杂度为 O(log n) 的算法解决此问题。
+```
+思路：
+- 二分查找+递归。第一个位置是第一个大于等于target位置，最后一个位置是第一个大于target位置-1
+- 比较简单的解法：若不考虑时间复杂度，也可以直接二分查找拿到mid后从l、r左右开始逼近求出第一个、最后一个位置
+```java
+//第一种
+class Solution {
+    public int[] searchRange(int[] nums, int target) {
+        int leftIdx = binarySearch(nums, target, true);
+        int rightIdx = binarySearch(nums, target, false) - 1;
+        if (leftIdx <= rightIdx && rightIdx < nums.length && nums[leftIdx] == target && nums[rightIdx] == target) {
+            return new int[]{leftIdx, rightIdx};
+        } 
+        return new int[]{-1, -1};
+    }
+
+    public int binarySearch(int[] nums, int target, boolean lower) {
+        int left = 0, right = nums.length - 1, ans = nums.length;
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            if (nums[mid] > target || (lower && nums[mid] >= target)) {
+                right = mid - 1;
+                ans = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return ans;
+    }
+}
+//第二种
+public class Solution {
+  public int[] searchRange(int[] nums, int target) {
+    int low = 0;
+    int high = nums.length - 1;
+    while (low <= high) {
+      int mid = ((high - low) >> 1) + low;
+      if (nums[mid] == target) {
+        while (nums[low] != target) low++;
+        while (nums[high] != target) high--;
+        return new int[] { low, high };
+      }
+      else if (nums[mid] < target) low = mid + 1;
+      else high = mid - 1;
+    }
+    return new int[] { -1, -1 };
+  }
+}
+```
 ## 35 搜索插入位置 easy
 ```
 给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。
@@ -204,15 +260,91 @@ class Solution {
             }
         });
         List<int[]> merged = new ArrayList<int[]>();
-        for (int i = 0; i < intervals.length; ++i) {
+        merged.add(intervals[0]);
+        for (int i = 1; i < intervals.length; ++i) {
             int L = intervals[i][0], R = intervals[i][1];
-            if (merged.size() == 0 || merged.get(merged.size() - 1)[1] < L) {
+            if (merged.get(merged.size() - 1)[1] < L) {
                 merged.add(new int[]{L, R});
             } else {
                 merged.get(merged.size() - 1)[1] = Math.max(merged.get(merged.size() - 1)[1], R);
             }
         }
         return merged.toArray(new int[merged.size()][]);
+    }
+}
+```
+## 189 轮转数组 middle
+```
+给定一个整数数组 nums，将数组中的元素向右轮转 k 个位置，其中 k 是非负数。
+```
+思路：
+- 使用额外数组，新的索引是(i + k) % length
+- 直接翻转，先将所有元素翻转，这样尾部的 k % length 个元素就被移至数组头部，然后我们再翻转 [0, k - 1] 区间的元素、[k, length - 1]区间的元素即能得到最后的答案
+```java
+//使用额外数组，新的索引是(i + k) % length
+class Solution {
+    public void rotate(int[] nums, int k) {
+        int length = nums.length;
+        int[] result = new int[length];
+        for (int i = 0; i < length; i++) {
+            result[(i + k) % length] = nums[i];
+        }
+        for (int i = 0; i < length; i++) {
+            nums[i] = result[i];
+        }
+    }
+}
+//不使用额外数组
+class Solution {
+    public void rotate(int[] nums, int k) {
+        k %= nums.length;
+        reverse(nums, 0, nums.length - 1);
+        reverse(nums, 0, k - 1);
+        reverse(nums, k, nums.length - 1);
+    }
+
+    public void reverse(int[] nums, int start, int end) {
+        while (start < end) {
+            int temp = nums[start];
+            nums[start] = nums[end];
+            nums[end] = temp;
+            start += 1;
+            end -= 1;
+        }
+    }
+}
+```
+## 238 除自身以外数组的乘积 middle
+```
+给你一个整数数组 nums，返回 数组 answer ，其中 answer[i] 等于 nums 中除 nums[i] 之外其余各元素的乘积 。
+
+题目数据 保证 数组 nums之中任意元素的全部前缀元素和后缀的乘积都在  32 位 整数范围内。
+
+请 不要使用除法，且在 O(n) 时间复杂度内完成此题。
+```
+思路：
+```
+原数组：           [1       2       3       4]
+左部分的乘积ans：   1       1      1*2    1*2*3
+右部分的乘积tmp：   2*3*4    3*4      4      1
+结果ans*tmp：      1*2*3*4  1*3*4   1*2*4  1*2*3*1
+```
+```java
+class Solution {
+    public int[] productExceptSelf(int[] nums) {
+        int len = nums.length;
+        if (len == 0) return new int[0];
+        int[] ans = new int[len];
+        ans[0] = 1;
+        int tmp = 1;
+        for (int i = 1; i < len; i++) {
+            ans[i] = ans[i - 1] * nums[i - 1];
+        }
+        for (int i = len - 2; i >= 0; i--) {
+            tmp *= nums[i + 1];
+            ans[i] *= tmp;
+        }
+        return ans;
     }
 }
 ```
@@ -377,6 +509,35 @@ class Solution {
                 matrix[j][i] = temp;
             }
         }
+    }
+}
+```
+## 74 搜索二维矩阵 middle
+```
+给你一个满足下述两条属性的 m x n 整数矩阵：
+
+每行中的整数从左到右按非严格递增顺序排列。
+每行的第一个整数大于前一行的最后一个整数。
+给你一个整数 target ，如果 target 在矩阵中，返回 true ；否则，返回 false 。
+```
+思路：根据定义可知若展开成一维数组后是一个排序好的数组，直接二分查找即可。或直接对每个int[]进行Arrays.binarySearch查找
+```java
+class Solution {
+    public boolean searchMatrix(int[][] matrix, int target) {
+        int m = matrix.length, n = matrix[0].length, index = 0, l = 0, r = m * n - 1, mid;
+        int[] arr = new int[m * n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                arr[index++] = matrix[i][j];
+            }
+        }
+        while (l <= r) {
+            mid = l + (r - l) / 2;
+            if (arr[mid] == target) return true;
+            else if (arr[mid] < target) l = mid + 1;
+            else r = mid - 1;
+        }
+        return false;
     }
 }
 ```
@@ -1463,6 +1624,48 @@ class Solution {
     }
 }
 ```
+## 394 字符串解码 middle
+```
+给定一个经过编码的字符串，返回它解码后的字符串。
+
+编码规则为: k[encoded_string]，表示其中方括号内部的 encoded_string 正好重复 k 次。注意 k 保证为正整数。
+
+你可以认为输入字符串总是有效的；输入字符串中没有额外的空格，且输入的方括号总是符合格式要求的。
+
+此外，你可以认为原始数据不包含数字，所有的数字只表示重复的次数 k ，例如不会出现像 3a 或 2[4] 的输入。
+```
+思路：
+```java
+class Solution {
+  public String decodeString(String s) {
+    StringBuilder res = new StringBuilder(); //收集字符
+    Stack<Integer> nums = new Stack<>(); //存储每个[]前的重复次数
+    Stack<StringBuilder> strs = new Stack<>(); //进入[]前存储已收集的串
+
+    int num = 0;
+    char[] chars = s.toCharArray();
+
+    for(char c : chars){
+      if (c >= '0' && c <= '9') num = num * 10 + c - '0'; //记录重复次数，次数可能>10
+      else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) sb.append(c);
+      else if (c == '[') {
+        strs.push(res); //把之前收集的字符串存入栈
+        res = new StringBuilder();
+        nums.push(num); //接下来的重复次数存入栈
+        num = 0;
+      }
+      else if(c == ']'){ //清算这个[]内的串
+        int times = nums.pop();
+        for(int i = 0; i < times; i++){
+          strs.peek().append(res); //上一级字符串后面增加这个[]内的串
+        }
+        res = strs.pop();
+      }
+    }
+    return res.toString();
+  }
+}
+```
 
 # 滑动窗口
 ## 3. 无重复字符的最长子串 middle
@@ -1655,9 +1858,7 @@ class Solution {
     private void recurse(TreeNode root, Integer deep) {
         if (root == null) return;
         deep++;
-        if (res.size() < deep) {
-            res.add(new ArrayList<Integer>());
-        }
+        if (res.size() < deep) res.add(new ArrayList<Integer>());
         res.get(deep - 1).add(root.val);
         recurse(root.left, deep);
         recurse(root.right, deep);
@@ -1690,18 +1891,20 @@ class Solution {
 ## 226 翻转二叉树 easy
 使用前序遍历或后序遍历比较容易。若用中序遍历，recurse(left) swap(node) recurse(left) 
 ```java
-public TreeNode invertTree(TreeNode root) {
-    recurse(root);
-    return root;
-}
+class Solution {
+    public TreeNode invertTree(TreeNode root) {
+        recurse(root);
+        return root;
+    }
 
-private void recurse(TreeNode node) {
-    if (node == null) return;
-    TreeNode temp = node.left;
-    node.left = node.right;
-    node.right = temp;
-    recurse(node.left);
-    recurse(node.right);
+    private void recurse(TreeNode node) {
+        if (node == null) return;
+        TreeNode temp = node.left;
+        node.left = node.right;
+        node.right = temp;
+        recurse(node.left);
+        recurse(node.right);
+    }
 }
 ```
 ## 101 对称二叉树 easy
@@ -1748,6 +1951,31 @@ class Solution {
     }
 }
 ```
+## 543 二叉树的直径 easy
+```
+给你一棵二叉树的根节点，返回该树的 直径 。
+
+二叉树的 直径 是指树中任意两个节点之间最长路径的 长度 。这条路径可能经过也可能不经过根节点 root 。
+
+两节点之间路径的 长度 由它们之间边数表示。
+```
+思路：后序遍历，也是二叉树深度的运用，某节点的最大直径 = 左右子树的深度和
+```java
+class Solution {
+    int ans = 0;
+    public int diameterOfBinaryTree(TreeNode root) {
+        depth(root);
+        return ans;
+    }
+    public int depth(TreeNode node) {
+        if (node == null) return 0; // 访问到空节点了，返回0
+        int L = depth(node.left); // 左子树的深度
+        int R = depth(node.right); // 右子树的深度
+        ans = Math.max(ans, L+R); // 将每个节点最大直径(左子树深度+右子树深度)当前最大值比较并取大者
+        return Math.max(L, R) + 1; // 返回该节点为根的子树的深度
+    }
+}
+```
 ## 110 平衡二叉树 easy
 思路：后序遍历，在求节点高度的过程中，判断左右节点高度差是否大于1，若是则直接返回-1即不符合平衡二叉树，其判断不符合的依据是高度差大于1、左节点已不符合、右节点已不符合
 ```java
@@ -1760,21 +1988,36 @@ class Solution {
         int leftHeight = getHeight(node.left);
         int rightHeight = getHeight(node.right);
         if (leftHeight == -1 || rightHeight == -1 || Math.abs(leftHeight - rightHeight) > 1) return -1;
-        int height = Math.max(leftHeight, rightHeight) + 1;
-        return height;
+        return Math.max(leftHeight, rightHeight) + 1;
     }
 }
 ```
 ## 222 完全二叉树的的节点个数 easy
-后序遍历，找出左右孩子的节点个数再加1，即当前节点所在子树的节点个数
+思路：
+- 第一种：递归左右中，这也可以用于普通的二叉树节点个数计算，普适的
+    - 终止条件：当前节点为空直接返回0
+    - 单层递归：获取左右子树的节点个数，加起来后再加1
+- 第二种：使用完全二叉树的性质进行计算，左右子树的深度相同时说明左子树是满二叉树，此时节点数是右子树节点数+2^left，深度不同时时说明最后一层不是满的，倒数第二层满，即右子树是满二叉树，此时节点数是左子数节点数+2^right
 ```java
+//递归左右中
 class Solution {
-    int result = 0;
     public int countNodes(TreeNode root) {
         if (root == null) return 0;
-        int left = countNodes(root.left);
-        int right = countNodes(root.right);
-        return result = left + right + 1;
+        return countNodes(root.left) + countNodes(root.right) + 1;
+    }
+}
+//使用完全二叉树的性质
+class Solution {
+    public int countNodes(TreeNode root) {
+        if (root == null) return 0;
+        int leftLevel = countLevels(root.left);
+        int rightLevel = countLevels(root.right);
+        if (leftLevel == rightLevel) return countNodes(root.right) + (1 << leftLevel);
+        else return countNodes(root.left) + (1 << rightLevel);
+    }
+    private int countLevels(TreeNode node) {
+        if (node == null) return 0;
+        return Math.max(countLevels(node.left), countLevels(node.right)) + 1;
     }
 }
 ```
@@ -2002,7 +2245,7 @@ class Solution {
         return left && right;
     }
 }
-//第二种：遍历中节点时设置前一个节点为当前节点，后续进行比较，更好些，不用担心最大值的类型问题
+//第二种：遍历中节点时设置当前节点为前一个节点，后续进行比较，更好些，不用担心最大值的类型问题
 class Solution {
     private TreeNode pre = null;
     public boolean isValidBST(TreeNode root) {
@@ -2106,27 +2349,101 @@ class Solution {
     }
 }
 ```
+## 236 二叉树的最近公共祖先 middle
+```
+给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
+```
+思路：若 root 是 p,q 的 最近公共祖先 ，则只可能为以下情况之一：
+- p 和 q 在 root 的子树中，且分列 root 的 异侧（即分别在左、右子树中）；
+- p=root，且 q 在 root 的左或右子树中；
+- q=root ，且 p 在 root 的左或右子树中；
+```java
+class Solution {
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        if(root == null || root == p || root == q) return root;
+        TreeNode left = lowestCommonAncestor(root.left, p, q);
+        TreeNode right = lowestCommonAncestor(root.right, p, q);
+        if(left == null) return right;
+        if(right == null) return left;
+        return root;
+    }
+}
+```
+## 230 二叉搜索树中第k小的元素 middle
+思路：
+- 最直观的是中序遍历后写到最小堆，然后取k次即结果
+- 
+```java
+class Solution {
+    PriorityQueue<Integer> queue = new PriorityQueue<>();
+    public int kthSmallest(TreeNode root, int k) {
+        recurse(root);
+        while (--k > 0) {
+            queue.poll();
+        }
+        return queue.poll();
+    }
+    private void recurse(TreeNode node) {
+        if (node == null) return;
+        recurse(node.left);
+        queue.offer(node.val);
+        recurse(node.right);
+    }
+}
+```
+## 114 二叉树展开为链表 middle
+```
+给你二叉树的根结点 root ，请你将它展开为一个单链表：
+
+展开后的单链表应该同样使用 TreeNode ，其中 right 子指针指向链表中下一个结点，而左子指针始终为 null 。
+展开后的单链表应该与二叉树 先序遍历 顺序相同。
+```
+思路：前序遍历写到ArrayList，然后修改二叉树
+```java
+class Solution {
+    List<TreeNode> list = new ArrayList<>();
+    public void flatten(TreeNode root) {
+        if (root == null) return;
+        recurse(root);
+        root = new TreeNode(list.get(0).val);
+        TreeNode cur = root, newNext;
+        for (int i = 1; i < list.size(); i++) {
+            TreeNode prev = list.get(i - 1), curr = list.get(i);
+            prev.left = null;
+            prev.right = curr;
+        }
+    }
+    private void recurse(TreeNode node) {
+        if (node == null) return;
+        list.add(node);
+        recurse(node.left);
+        recurse(node.right);
+    }
+}
+```
 
 # 模拟
 ## 2899 上一个遍历的整数 easy
 ```java
-public List<Integer> lastVisitedIntegers(int[] nums) {
-    List<Integer> seen = new ArrayList<>(), ans = new ArrayList<>();
-    int index = 1;
-    boolean flag = true;
-    for (int num : nums) {
+class Solution {
+    public List<Integer> lastVisitedIntegers(int[] nums) {
+      List<Integer> seen = new ArrayList<>(), ans = new ArrayList<>();
+      int index = 1;
+      boolean flag = true;
+      for (int num : nums) {
         if (num != -1) {
-            seen.add(num);
-            flag = false;
-            index = 1;
+          seen.add(num);
+          flag = false;
+          index = 1;
         } else {
-            if (flag) index++;
-            int pos = seen.size() - index;
-            ans.add(pos >= 0 ? seen.get(pos) : -1);
-            flag = true;
+          if (flag) index++;
+          int pos = seen.size() - index;
+          ans.add(pos >= 0 ? seen.get(pos) : -1);
+          flag = true;
         }
-    }
-    return ans;
+      }
+      return ans;
+    } 
 }
 ```
 
