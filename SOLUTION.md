@@ -40,7 +40,6 @@ class Solution {
     }
 }
 ```
-
 ## 977 有序数组的平方 easy 
 双指针，选较大的那个值逆序放到结果集并移动相应的指针
 ```java
@@ -61,6 +60,26 @@ class Solution {
             k--;
         }
         return result;
+    }
+}
+```
+## 35 搜索插入位置 easy
+```
+给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。
+请必须使用时间复杂度为 O(log n) 的算法。
+```
+思路：二分查找。不断用二分法逼近查找第一个大于等于 target 的下标，能找到则是mid，找不到则是二分查找后最终区间的左界
+```java
+class Solution {
+    public int searchInsert(int[] nums, int target) {
+        int l = 0, r = nums.length - 1, mid = 0;
+        while (l <= r) {
+            mid = l + (r - l) / 2;
+            if (nums[mid] < target) l = mid + 1;
+            else if (nums[mid] > target) r = mid - 1;
+            else return mid;
+        }
+        return l;
     }
 }
 ```
@@ -597,6 +616,64 @@ class Solution {
     }
 }
 ```
+## 148 排序链表 middle
+```
+给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。
+```
+思路：
+- 第一种：比较直观的想法是用一个list记录遍历后的值然后排序，再依次对链表每个节点赋值，时间效率低 O(N)
+- 第二种：归并排序，用递归，时间效率高 O(N*LogN)
+```java
+//第一种
+class Solution {
+    public ListNode sortList(ListNode head) {
+        List<Integer> list = new ArrayList<>();
+        ListNode cur = head;
+        while (cur != null) {
+            list.add(cur.val);
+            cur = cur.next;
+        }
+        Collections.sort(list);
+        cur = head;
+        int index = 0;
+        while (cur != null) {
+            cur.val = list.get(index++);
+            cur = cur.next;
+        }
+        return head;
+    }
+}
+//第二种
+class Solution {
+    public ListNode sortList(ListNode head) {
+        if (head == null || head.next == null)
+            return head;
+        ListNode fast = head.next, slow = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        ListNode tmp = slow.next;
+        slow.next = null;
+        ListNode left = sortList(head);
+        ListNode right = sortList(tmp);
+        ListNode h = new ListNode(0);
+        ListNode res = h;
+        while (left != null && right != null) {
+            if (left.val < right.val) {
+                h.next = left;
+                left = left.next;
+            } else {
+                h.next = right;
+                right = right.next;
+            }
+            h = h.next;
+        }
+        h.next = left != null ? left : right;
+        return res.next;
+    }
+}
+```
 ## 24 两两交换链表中的节点 middle
 思路：
 - 迭代：使用虚拟头节点指向head，cur作为虚拟头节点，cur下个节点指向second，second下个节点指向first，first下个节点指向third（tmp），然后置cur为first即此时的第二个字节
@@ -814,6 +891,40 @@ class Solution {
             l2.next = mergeTwoLists(l1, l2.next);
             return l2;
         }
+    }
+}
+```
+## 2 两数相加 middle
+```
+给你两个 非空 的链表，表示两个非负的整数。它们每位数字都是按照 逆序 的方式存储的，并且每个节点只能存储 一位 数字。
+
+请你将两个数相加，并以相同形式返回一个表示和的链表。
+
+你可以假设除了数字 0 之外，这两个数都不会以 0 开头。
+```
+思路：同时遍历两个链表，逐位计算它们的和，并与当前位置的进位值相加即sum = n1 + n2 + carry，当前节点的值是sum % 10，新的进位是sum / 10。如果链表遍历结束后，有 carry>0，还需要在答案链表的后面附加一个节点，节点的值为 carry
+```java
+class Solution {
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        ListNode head = null, tail = null;
+        int n1, n2, carry = 0, sum = 0;
+        while (l1 != null || l2 != null) {
+            n1 = l1 == null ? 0 : l1.val;
+            n2 = l2 == null ? 0 : l2.val;
+            sum = n1 + n2 + carry;
+            ListNode newNode = new ListNode(sum % 10);
+            if (head == null) {
+                head = tail = newNode;
+            } else {
+                tail.next = newNode;
+                tail = tail.next;
+            }
+            carry = sum / 10;
+            if (l1 != null) l1 = l1.next;
+            if (l2 != null) l2 = l2.next;
+        }
+        if (carry != 0) tail.next = new ListNode(carry);
+        return head;
     }
 }
 ```
@@ -1194,6 +1305,52 @@ class MyStack {
     
     public boolean empty() {
         return queue.isEmpty();
+    }
+}
+```
+## 155 最小栈 middle
+```
+设计一个支持 push ，pop ，top 操作，并能在常数时间内检索到最小元素的栈。
+
+实现 MinStack 类:
+
+MinStack() 初始化堆栈对象。
+void push(int val) 将元素val推入堆栈。
+void pop() 删除堆栈顶部的元素。
+int top() 获取堆栈顶部的元素。
+int getMin() 获取堆栈中的最小元素。
+```
+思路：只需要设计一个数据结构，使得每个元素 a 与其相应的最小值 m 时刻保持一一对应。因此我们可以使用一个辅助栈，与元素栈同步插入与删除，用于存储与每个元素对应的最小值。
+- 当一个元素要入栈时，我们取当前辅助栈的栈顶存储的最小值，与当前元素比较得出最小值，将这个最小值插入辅助栈中；
+- 当一个元素要出栈时，我们把辅助栈的栈顶元素也一并弹出；
+- 在任意一个时刻，栈内元素的最小值就存储在辅助栈的栈顶元素中。
+```java
+class MinStack {
+    Deque<Integer> xStack; //元素栈
+    Deque<Integer> minStack; //对应元素的最小栈，与元素栈中的每个元素一一对应
+
+    public MinStack() {
+        xStack = new LinkedList<Integer>();
+        minStack = new LinkedList<Integer>();
+        minStack.push(Integer.MAX_VALUE);
+    }
+    
+    public void push(int x) {
+        xStack.push(x);
+        minStack.push(Math.min(minStack.peek(), x));
+    }
+    
+    public void pop() {
+        xStack.pop();
+        minStack.pop();
+    }
+    
+    public int top() {
+        return xStack.peek();
+    }
+    
+    public int getMin() {
+        return minStack.peek();
     }
 }
 ```
@@ -1591,21 +1748,8 @@ class Solution {
     }
 }
 ```
-## 222 完全二叉树的的节点个数 easy
-后序遍历，找出左右孩子的节点个数再加1，即当前节点所在子树的节点个数
-```java
-class Solution {
-    int result = 0;
-    public int countNodes(TreeNode root) {
-        if (root == null) return 0;
-        int left = countNodes(root.left);
-        int right = countNodes(root.right);
-        return result = left + right + 1;
-    }
-}
-```
 ## 110 平衡二叉树 easy
-后序遍历，在求节点高度的过程中，判断左右节点高度差是否小于2，若不是则直接返回-1即不符合平衡二叉树，其判断不符合的依据是高度差大于1、左节点已不符合、右节点已不符合
+思路：后序遍历，在求节点高度的过程中，判断左右节点高度差是否大于1，若是则直接返回-1即不符合平衡二叉树，其判断不符合的依据是高度差大于1、左节点已不符合、右节点已不符合
 ```java
 class Solution {
     public boolean isBalanced(TreeNode root) {
@@ -1618,6 +1762,19 @@ class Solution {
         if (leftHeight == -1 || rightHeight == -1 || Math.abs(leftHeight - rightHeight) > 1) return -1;
         int height = Math.max(leftHeight, rightHeight) + 1;
         return height;
+    }
+}
+```
+## 222 完全二叉树的的节点个数 easy
+后序遍历，找出左右孩子的节点个数再加1，即当前节点所在子树的节点个数
+```java
+class Solution {
+    int result = 0;
+    public int countNodes(TreeNode root) {
+        if (root == null) return 0;
+        int left = countNodes(root.left);
+        int right = countNodes(root.right);
+        return result = left + right + 1;
     }
 }
 ```
@@ -1647,32 +1804,36 @@ class Solution {
 ## 257 二叉树的所有路径 easy
 前序遍历+回溯
 ```java
-public List<String> binaryTreePaths(TreeNode root) {
-    List<String> result = new ArrayList<>();
-    recurse(root, new ArrayList<String>(), result);
-    return result;
-}
-private void recurse(TreeNode node, List<String> path, List<String> result) {
-    path.add(String.valueOf(node.val)); //中序遍历
-    if (node.left == null && node.right == null) result.add(String.join("->", path)); //遇到叶节点
-    if (node.left != null) {
-        recurse(node.left, path, result);
-        path.remove(path.size() - 1); //回溯
+class Solution {
+    public List<String> binaryTreePaths(TreeNode root) {
+        List<String> result = new ArrayList<>();
+        recurse(root, new ArrayList<String>(), result);
+        return result;
     }
-    if (node.right != null) {
-        recurse(node.right, path, result);
-        path.remove(path.size() - 1); //回溯
+    private void recurse(TreeNode node, List<String> path, List<String> result) {
+        path.add(String.valueOf(node.val)); //中序遍历
+        if (node.left == null && node.right == null) result.add(String.join("->", path)); //遇到叶节点
+        if (node.left != null) {
+            recurse(node.left, path, result);
+            path.remove(path.size() - 1); //回溯
+        }
+        if (node.right != null) {
+            recurse(node.right, path, result);
+            path.remove(path.size() - 1); //回溯
+        }
     }
 }
 ```
 ## 404 左叶子之和 easy
 后序遍历，当中间节点满足左孩子是左叶节点时，加上左叶节点的值
 ```java
-public int sumOfLeftLeaves(TreeNode root) {
-    if(root==null) return 0;
-    return sumOfLeftLeaves(root.left) 
-        + sumOfLeftLeaves(root.right) 
-        + (root.left!=null && root.left.left==null && root.left.right==null ? root.left.val : 0);
+class Solution {
+    public int sumOfLeftLeaves(TreeNode root) {
+        if(root==null) return 0;
+        return sumOfLeftLeaves(root.left)
+                + sumOfLeftLeaves(root.right)
+                + (root.left!=null && root.left.left==null && root.left.right==null ? root.left.val : 0);
+    }
 }
 ```
 ## 513 找树左下角的值 middle
