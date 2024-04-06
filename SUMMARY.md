@@ -15,5 +15,6 @@
 * [day15](DAY15.md)
 * [day16](DAY16.md)
 * [day17](DAY17.md)
+* [day18](DAY18.md)
 * [solution](SOLUTION.md)
 * [coder](CODER.md)
