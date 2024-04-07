@@ -63,6 +63,97 @@ class Solution {
     }
 }
 ```
+## 33 搜索旋转排序数组 middle
+```
+整数数组 nums 按升序排列，数组中的值 互不相同 。
+
+在传递给函数之前，nums 在预先未知的某个下标 k（0 <= k < nums.length）上进行了 旋转，使数组变为 [nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]（下标 从 0 开始 计数）。例如， [0,1,2,4,5,6,7] 在下标 3 处经旋转后可能变为 [4,5,6,7,0,1,2] 。
+
+给你 旋转后 的数组 nums 和一个整数 target ，如果 nums 中存在这个目标值 target ，则返回它的下标，否则返回 -1 。
+
+你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。
+```
+思路：
+- 在常规二分查找的时候查看当前 mid 为分割位置分割出来的两个部分 [l, mid] 和 [mid + 1, r] 哪个部分是有序的，并根据有序的那个部分确定我们该如何改变二分查找的上下界，因为我们能够根据有序的那部分判断出 target 在不在这个部分。根据nums[0]与中间元素比较，若小于等于则target必在左半段，大于则在右半段
+  - 如果 [l, mid - 1] 是有序数组，且 target 的大小满足 [nums[l],nums[mid])，则我们应该将搜索范围缩小至 [l, mid - 1]，否则在 [mid + 1, r] 中寻找。
+  - 如果 [mid, r] 是有序数组，且 target 的大小满足 (nums[mid],nums[r]]，则我们应该将搜索范围缩小至 [mid + 1, r]，否则在 [l, mid - 1] 中寻找。
+- 将数组分隔成两个排序数组，然后分别二分查找。但这样并不是严格O(logN)，极端情况是O(N)
+```java
+//第一种
+class Solution {
+  public int search(int[] nums, int target) {
+    int n = nums.length;
+    if (n == 0) return -1;
+    if (n == 1) return nums[0] == target ? 0 : -1;
+    int l = 0, r = n - 1;
+    while (l <= r) {
+      int mid = (l + r) / 2;
+      if (nums[mid] == target) return mid;
+      if (nums[0] <= nums[mid]) {
+        if (nums[l] <= target && target < nums[mid]) r = mid - 1;
+        else l = mid + 1;
+      } else {
+        if (nums[mid] < target && target <= nums[n - 1]) l = mid + 1;
+        else r = mid - 1;
+      }
+    }
+    return -1;
+  }
+}
+//第二种
+class Solution {
+    public int search(int[] nums, int target) {
+        if (nums.length == 1) return nums[0] == target ? 0 : -1;
+        int cut = 0;
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i - 1] > nums[i]) {
+                cut = i;
+                break;
+            }
+        }
+        return Math.max(binarySearch(nums, target, 0, cut - 1), binarySearch(nums, target, cut, nums.length - 1));
+    }
+    private int binarySearch(int[] nums, int target, int left, int right) {
+        int l = left, r = right, mid;
+        while (l <= r) {
+            mid = l + (r - l) / 2;
+            if (nums[mid] == target) return mid;
+            if (nums[mid] < target) l = mid + 1;
+            else r = mid - 1;
+        }
+        return -1;
+    }
+}
+```
+## 153 寻找旋转排序数组中的最小值 middle
+```
+已知一个长度为 n 的数组，预先按照升序排列，经由 1 到 n 次 旋转 后，得到输入数组。例如，原数组 nums = [0,1,2,4,5,6,7] 在变化后可能得到：
+若旋转 4 次，则可以得到 [4,5,6,7,0,1,2]
+若旋转 7 次，则可以得到 [0,1,2,4,5,6,7]
+注意，数组 [a[0], a[1], a[2], ..., a[n-1]] 旋转一次 的结果为数组 [a[n-1], a[0], a[1], a[2], ..., a[n-2]] 。
+
+给你一个元素值 互不相同 的数组 nums ，它原来是一个升序排列的数组，并按上述情形进行了多次旋转。请你找出并返回数组中的 最小元素 。
+
+你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。
+```
+思路：二分查找，考虑数组中的最后一个元素 x：在最小值右侧的元素（不包括最后一个元素本身），它们的值一定都严格小于 x；而在最小值左侧的元素，它们的值一定都严格大于 x。因此，我们可以根据这一条性质，通过二分查找的方法找出最小值
+```java
+class Solution {
+    public int findMin(int[] nums) {
+        int left = 0;
+        int right = nums.length - 1;
+        while (left < right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] < nums[right]) {
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+        return nums[left];
+    }
+}
+```
 ## 34 在排序数组中查找元素的第一个和最后一个位置 middle
 ```
 给你一个按照非递减顺序排列的整数数组 nums，和一个目标值 target。请你找出给定目标值在数组中的开始位置和结束位置。
@@ -72,10 +163,29 @@ class Solution {
 你必须设计并实现时间复杂度为 O(log n) 的算法解决此问题。
 ```
 思路：
-- 二分查找+递归。第一个位置是第一个大于等于target位置，最后一个位置是第一个大于target位置-1
 - 比较简单的解法：若不考虑时间复杂度，也可以直接二分查找拿到mid后从l、r左右开始逼近求出第一个、最后一个位置
+- 二分查找+递归。第一个位置是第一个大于等于target位置，最后一个位置是第一个大于target位置-1
 ```java
 //第一种
+class Solution {
+  public int[] searchRange(int[] nums, int target) {
+    int l = 0, r = nums.length - 1, mid, one, two;
+    int[] result = new int[2];
+    while (l <= r) {
+      mid = l + (r - l) / 2;
+      if (nums[mid] == target) {
+        one = two = mid;
+        while (one - 1 >= 0 && nums[one - 1] == target) one--;
+        while (two + 1 <= nums.length - 1 && nums[two + 1] == target) two++;
+        return new int[]{one, two};
+      }
+      else if (nums[mid] < target) l = mid + 1;
+      else r = mid - 1;
+    }
+    return new int[]{-1, -1};
+  }
+}
+//第二种
 class Solution {
     public int[] searchRange(int[] nums, int target) {
         int leftIdx = binarySearch(nums, target, true);
@@ -99,24 +209,6 @@ class Solution {
         }
         return ans;
     }
-}
-//第二种
-public class Solution {
-  public int[] searchRange(int[] nums, int target) {
-    int low = 0;
-    int high = nums.length - 1;
-    while (low <= high) {
-      int mid = ((high - low) >> 1) + low;
-      if (nums[mid] == target) {
-        while (nums[low] != target) low++;
-        while (nums[high] != target) high--;
-        return new int[] { low, high };
-      }
-      else if (nums[mid] < target) low = mid + 1;
-      else high = mid - 1;
-    }
-    return new int[] { -1, -1 };
-  }
 }
 ```
 ## 35 搜索插入位置 easy
@@ -407,6 +499,28 @@ class Solution {
         }
         return res;
     }
+}
+```
+## 121 买卖股票的最佳时机 easy
+```
+给定一个数组 prices ，它的第 i 个元素 prices[i] 表示一支给定股票第 i 天的价格。
+
+你只能选择 某一天 买入这只股票，并选择在 未来的某一个不同的日子 卖出该股票。设计一个算法来计算你所能获取的最大利润。
+
+返回你可以从这笔交易中获取的最大利润。如果你不能获取任何利润，返回 0 。
+```
+思路：只需要遍历价格数组一遍，记录历史最低点，然后在每一天考虑这么一个问题：如果我是在历史最低点买进的，那么我今天卖出能赚多少钱？当考虑完所有天数之时，我们就得到了最好的答案
+```java
+class Solution {
+  public int maxProfit(int[] prices) {
+    int minPrice = prices[0];
+    int maxProfit = 0;
+    for (int price: prices) {
+      if (price < minPrice) minPrice = price;
+      maxProfit = Math.max(maxProfit, price - minPrice);
+    }
+    return maxProfit;
+  }
 }
 ```
 
@@ -2562,5 +2676,38 @@ class Solution {
         return -1;
 
     }
+}
+```
+
+# 动态规划
+
+## 70 爬楼梯 easy
+```
+假设你正在爬楼梯。需要 n 阶你才能到达楼顶。
+
+每次你可以爬 1 或 2 个台阶。你有多少种不同的方法可以爬到楼顶呢？
+```
+思路：考虑最后一步可能跨了一级台阶，也可能跨了两级台阶，因此只要得到这两种情况的爬楼梯方法，加起来就是当前台阶数的。
+- 动态规划
+- 递归，会超时
+```java
+//动态规划
+class Solution {
+  public int climbStairs(int n) {
+    int p = 0, q = 0, r = 1;
+    for (int i = 1; i <= n; ++i) {
+      p = q;
+      q = r;
+      r = p + q;
+    }
+    return r;
+  }
+}
+//递归
+class Solution {
+  public int climbStairs(int n) {
+    if (n <= 2) return n;
+    return climbStairs(n - 1) + climbStairs(n - 2);
+  }
 }
 ```
