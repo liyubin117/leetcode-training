@@ -137,6 +137,8 @@ class Solution {
 你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。
 ```
 思路：二分查找，考虑数组中的最后一个元素 x：在最小值右侧的元素（不包括最后一个元素本身），它们的值一定都严格小于 x；而在最小值左侧的元素，它们的值一定都严格大于 x。因此，我们可以根据这一条性质，通过二分查找的方法找出最小值
+- 如果中间节点小于最右节点，说明最小值在左侧
+- 如果中间节点大于等于最右节点，说明最小值在右侧
 ```java
 class Solution {
     public int findMin(int[] nums) {
@@ -1870,7 +1872,7 @@ class Solution {
 }
 ```
 
-# 递归
+# 二叉树
 ## 144 二叉树的前序遍历 easy
 ```java
 //递归 中左右
@@ -2386,7 +2388,7 @@ class Solution {
         return left && right;
     }
 }
-//第二种：遍历中节点时设置当前节点为前一个节点，后续进行比较，更好些，不用担心最大值的类型问题
+//第二种：遍历中节点时设置当前节点为前一个节点，后续进行比较，更好些，不用担心最大值的类型问题。推荐！
 class Solution {
     private TreeNode pre = null;
     public boolean isValidBST(TreeNode root) {
@@ -2560,6 +2562,40 @@ class Solution {
         recurse(node.left);
         recurse(node.right);
     }
+}
+```
+
+# 回溯
+## 22 括号生成 middle
+```
+数字 n 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 有效的 括号组合。
+```
+思路：
+```java
+class Solution {
+  List<String> result = new ArrayList<>();
+  public List<String> generateParenthesis(int n) {
+    backtracking(n, 0, 0, "");
+    return result;
+  }
+
+  private void backtracking(int n, int left, int right, String str) {
+    if (right > left) {
+      return;
+    }
+    if (left == n && right == n) {
+      result.add(str);
+      return;
+    }
+
+    if (left < n) {
+      backtracking(n, left + 1, right, str + "(");
+    }
+
+    if (right < left) {
+      backtracking(n, left, right + 1, str + ")");
+    }
+  }
 }
 ```
 
