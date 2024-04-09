@@ -2747,3 +2747,56 @@ class Solution {
   }
 }
 ```
+## 300 最长递增子序列 middle
+```
+给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。
+
+子序列 是由数组派生而来的序列，删除（或不删除）数组中的元素而不改变其余元素的顺序。例如，[3,6,2,7] 是数组 [0,3,1,6,2,2,7] 的
+子序列。
+```
+思路：
+- 动态规划，时间复杂度O(N^2)，空间复杂度O(N)
+  - 状态定义：dp[i]的值代表以nums[i]结尾的最长子序列长度
+  - 转移方程： 设 j∈[0,i)，考虑每轮计算新 dp[i] 时，遍历 [0,i) 列表区间
+    - 当 nums[i]>nums[j] 时，最长递增子序列长度为 dp[j]+1
+    - 当 nums[i]<=nums[j] 时，非递增，跳过
+    - 遍历 j 时，每轮执行 dp[i]=max(dp[i],dp[j]+1)
+  - 初始状态：dp[i] 所有元素置 1，含义是每个元素都至少可以单独成为子序列，此时长度都为 1。
+  - 返回值：返回 dp 列表最大值，即可得到全局最长上升子序列长度
+```java
+class Solution {
+    public int lengthOfLIS(int[] nums) {
+        if(nums.length == 0) return 0;
+        int[] dp = new int[nums.length];
+        int res = 0;
+        Arrays.fill(dp, 1);
+        for(int i = 0; i < nums.length; i++) {
+            for(int j = 0; j < i; j++) {
+                if(nums[j] < nums[i]) dp[i] = Math.max(dp[i], dp[j] + 1);
+            }
+            res = Math.max(res, dp[i]);
+        }
+        return res;
+    }
+}
+```
+- 二分查找
+```java
+class Solution {
+    public int lengthOfLIS(int[] nums) {
+        int[] tails = new int[nums.length];
+        int res = 0;
+        for(int num : nums) {
+            int i = 0, j = res;
+            while(i < j) {
+                int m = (i + j) / 2;
+                if(tails[m] < num) i = m + 1;
+                else j = m;
+            }
+            tails[i] = num;
+            if(res == j) res++;
+        }
+        return res;
+    }
+}
+```
