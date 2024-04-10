@@ -18,6 +18,7 @@
 * [day18](DAY18.md)
 * [day20](DAY20.md)
 * [day21](DAY21.md)
+* [day22](DAY22.md)
 * [coder](CODER.md)
 * [leetcode](LEETCODE.md)
 * [nowcoder](NOWCODER.md)

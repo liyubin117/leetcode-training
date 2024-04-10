@@ -40,6 +40,55 @@ class Solution {
     }
 }
 ```
+## 31 下一个排列 middle
+```
+整数数组的一个 排列  就是将其所有成员以序列或线性顺序排列。
+
+例如，arr = [1,2,3] ，以下这些都可以视作 arr 的排列：[1,2,3]、[1,3,2]、[3,1,2]、[2,3,1] 。
+整数数组的 下一个排列 是指其整数的下一个字典序更大的排列。更正式地，如果数组的所有排列根据其字典顺序从小到大排列在一个容器中，那么数组的 下一个排列 就是在这个有序容器中排在它后面的那个排列。如果不存在下一个更大的排列，那么这个数组必须重排为字典序最小的排列（即，其元素按升序排列）。
+
+例如，arr = [1,2,3] 的下一个排列是 [1,3,2] 。
+类似地，arr = [2,3,1] 的下一个排列是 [3,1,2] 。
+而 arr = [3,2,1] 的下一个排列是 [1,2,3] ，因为 [3,2,1] 不存在一个字典序更大的排列。
+给你一个整数数组 nums ，找出 nums 的下一个排列。
+
+必须 原地 修改，只允许使用额外常数空间。
+```
+思路：双指针
+```java
+class Solution {
+    //先从右往左找出第一个非递增的元素，此为较小值，位置记为i，再从右往左找出第一个比它大的元素即较大值，位置记为j，调换位置，再将i之后的元素按字典序排序
+    public void nextPermutation(int[] nums) {
+        int i = nums.length - 2;
+        while (i >= 0 && nums[i] >= nums[i + 1]) {
+            i--;
+        }
+        if (i >= 0) {
+            int j = nums.length - 1;
+            while (j >= 0 && nums[i] >= nums[j]) {
+                j--;
+            }
+            swap(nums, i, j);
+        }
+        reverse(nums, i + 1);
+    }
+
+    public void swap(int[] nums, int i, int j) {
+        int temp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = temp;
+    }
+
+    public void reverse(int[] nums, int start) {
+        int left = start, right = nums.length - 1;
+        while (left < right) {
+            swap(nums, left, right);
+            left++;
+            right--;
+        }
+    }
+}
+```
 ## 977 有序数组的平方 easy 
 双指针，选较大的那个值逆序放到结果集并移动相应的指针
 ```java
@@ -2564,6 +2613,99 @@ class Solution {
     }
 }
 ```
+## 701 二叉搜索树中的插入操作 middle
+```
+给定二叉搜索树（BST）的根节点 root 和要插入树中的值 value ，将值插入二叉搜索树。 返回插入后二叉搜索树的根节点。 输入数据 保证 ，新值和原始二叉搜索树中的任意节点值都不同。
+
+注意，可能存在多种有效的插入方式，只要树在插入后仍保持为二叉搜索树即可。 你可以返回 任意有效的结果 。
+```
+思路：
+- 递归，根据目标值与当前元素值的大小比较，决定递归方向。更好理解
+- 迭代
+```java
+//递归
+class Solution {
+    public TreeNode insertIntoBST(TreeNode root, int val) {
+        if (root == null) // 如果当前节点为空，也就意味着val找到了合适的位置，此时创建节点直接返回。
+            return new TreeNode(val);
+
+        if (root.val < val){
+            root.right = insertIntoBST(root.right, val); // 递归创建右子树
+        }else if (root.val > val){
+            root.left = insertIntoBST(root.left, val); // 递归创建左子树
+        }
+        return root;
+    }
+}
+//迭代
+class Solution {
+    public TreeNode insertIntoBST(TreeNode root, int val) {
+        if (root == null) return new TreeNode(val);
+        TreeNode newRoot = root;
+        TreeNode pre = null;
+        while (root != null) {
+            pre = root; //记录当前节点为上一个节点，用于下次比较
+            if (root.val > val) {
+                root = root.left;
+            } else if (root.val < val) {
+                root = root.right;
+            }
+        }
+        if (pre.val > val) {
+            pre.left = new TreeNode(val);
+        } else {
+            pre.right = new TreeNode(val);
+        }
+
+        return newRoot;
+    }
+}
+```
+## 450 删除二叉搜索树中的节点 middle
+```
+给定一个二叉搜索树的根节点 root 和一个值 key，删除二叉搜索树中的 key 对应的节点，并保证二叉搜索树的性质不变。返回二叉搜索树（有可能被更新）的根节点的引用。
+
+一般来说，删除节点可分为两个步骤：
+首先找到需要删除的节点；
+如果找到了，删除它。
+```
+思路：递归
+- 终止条件：遇到空返回
+- 单层递归：共五种情况
+  - 第一种情况：没找到删除的节点，遍历到空节点直接返回了
+  - 找到删除的节点
+    - 第二种情况：左右孩子都为空（叶子节点），直接删除节点， 返回NULL为根节点
+    - 第三种情况：删除节点的左孩子为空，右孩子不为空，删除节点，右孩子补位，返回右孩子为根节点
+    - 第四种情况：删除节点的右孩子为空，左孩子不为空，删除节点，左孩子补位，返回左孩子为根节点
+    - 第五种情况：左右孩子节点都不为空，则将删除节点的左子树头结点（左孩子）放到删除节点的右子树的最左面节点的左孩子上，返回删除节点右孩子为新的根节点。
+```java
+class Solution {
+    public TreeNode deleteNode(TreeNode root, int key) {
+        root = delete(root,key);
+        return root;
+    }
+
+    private TreeNode delete(TreeNode root, int key) {
+        if (root == null) return null; //第一种情况
+
+        if (root.val > key) {
+            root.left = delete(root.left,key);
+        } else if (root.val < key) {
+            root.right = delete(root.right,key);
+        } else {
+            if (root.left == null) return root.right; //第二、三种情况
+            if (root.right == null) return root.left; //第四种情况
+            TreeNode tmp = root.right;
+            while (tmp.left != null) { //第五种情况，找到左叶节点
+                tmp = tmp.left;
+            }
+            root.val = tmp.val;
+            root.right = delete(root.right,tmp.val);
+        }
+        return root;
+    }
+}
+```
 
 # 回溯
 ## 22 括号生成 middle
@@ -2797,6 +2939,33 @@ class Solution {
             if(res == j) res++;
         }
         return res;
+    }
+}
+```
+## 322 零钱兑换 middle
+```
+给你一个整数数组 coins ，表示不同面额的硬币；以及一个整数 amount ，表示总金额。
+
+计算并返回可以凑成总金额所需的 最少的硬币个数 。如果没有任何一种硬币组合能组成总金额，返回 -1 。
+
+你可以认为每种硬币的数量是无限的。
+```
+思路：动态规划
+```java
+public class Solution {
+    public int coinChange(int[] coins, int amount) {
+        int max = amount + 1;
+        int[] dp = new int[amount + 1];
+        Arrays.fill(dp, max);
+        dp[0] = 0;
+        for (int i = 1; i <= amount; i++) {
+            for (int j = 0; j < coins.length; j++) {
+                if (coins[j] <= i) {
+                    dp[i] = Math.min(dp[i], dp[i - coins[j]] + 1);
+                }
+            }
+        }
+        return dp[amount] > amount ? -1 : dp[amount];
     }
 }
 ```
