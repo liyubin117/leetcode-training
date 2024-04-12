@@ -1756,6 +1756,9 @@ class Solution {
 }
 ```
 ## 347 前k个高频元素 middle
+```
+给你一个整数数组 nums 和一个整数 k ，请你返回其中出现频率前 k 高的元素。你可以按 任意顺序 返回答案。
+```
 思路：最小堆PriorityQueue，先统计出所有元素的次数，然后依次加到堆里，入堆前先判断堆的元素个数是否小于k，若小于则直接入堆，不小于则判断若堆顶元素小于要加的元素就先抛出堆顶元素再入堆
 ```java
 class Solution {
@@ -1821,6 +1824,72 @@ class Solution {
     }
     return res.toString();
   }
+}
+```
+## 215 数组中的第K个最大元素 middle
+```
+给定整数数组 nums 和整数 k，请返回数组中第 k 个最大的元素。
+
+请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。
+
+你必须设计并实现时间复杂度为 O(n) 的算法解决此问题。
+```
+思路：
+- 快排算法，O(N)，推荐用。快速排序的核心包括“哨兵划分” 和 “递归” 。
+  - 哨兵划分： 以数组某个元素（一般选取首元素）为基准数，将所有小于基准数的元素移动至其左边，大于基准数的元素移动至其右边。
+  - 递归： 对 左子数组 和 右子数组 递归执行 哨兵划分，直至子数组长度为 1 时终止递归，即可完成对整个数组的排序。
+![img.png](./images/img_quick_sort.png)
+```java
+public class Solution {
+    public int findKthLargest(int[] nums, int k) {
+        List<Integer> numList = new ArrayList<>();
+        for (int num : nums) {
+            numList.add(num);
+        }
+        return quickSelect(numList, k);
+    }
+    private int quickSelect(List<Integer> nums, int k) {
+        // 随机选择基准数
+        Random rand = new Random();
+        int pivot = nums.get(rand.nextInt(nums.size()));
+        // 将大于、小于、等于 pivot 的元素划分至 big, small, equal 中
+        List<Integer> big = new ArrayList<>();
+        List<Integer> equal = new ArrayList<>();
+        List<Integer> small = new ArrayList<>();
+        for (int num : nums) {
+            if (num > pivot)
+                big.add(num);
+            else if (num < pivot)
+                small.add(num);
+            else
+                equal.add(num);
+        }
+        // 第 k 大元素在 big 中，递归划分。因为此时较大的组的元素个数不小于k，肯定有第k大元素
+          if (k <= big.size())
+            return quickSelect(big, k);
+        // 第 k 大元素在 small 中，递归划分
+        if (k > big.size() + equal.size())
+            return quickSelect(small, k - big.size() - equal.size());
+        // 第 k 大元素在 equal 中，直接返回 pivot
+        return pivot;
+    }
+}
+```
+- 小顶堆。可以使用PriorityQueue或者手动实现，但这个严格来说是O(N*logN)
+```java
+class Solution {
+    public int findKthLargest(int[] nums, int k) {
+        PriorityQueue<Integer> pq=new PriorityQueue<>(k);
+        for (int num : nums) {
+            if (pq.size() < k) {
+                pq.offer(num);
+            } else if (num > pq.peek()) {
+                pq.poll();
+                pq.offer(num);
+            }
+        }
+        return pq.peek();
+    }
 }
 ```
 
@@ -2746,6 +2815,35 @@ class Solution {
 ```
 
 # 回溯
+## 46 全排列 middle
+```
+给定一个不含重复数字的数组 nums ，返回其 所有可能的全排列 。你可以 按任意顺序 返回答案。
+```
+思路：回溯
+- 终止条件：path元素数量满足要求即收集结果
+- 单层递归：遍历数组，若path已添加该元素则跳过，未添加则加入后进行递归再回溯
+```java
+class Solution {
+    List<List<Integer>> result = new ArrayList<>();
+    LinkedList<Integer> path = new LinkedList<>();
+    public List<List<Integer>> permute(int[] nums) {
+        backtracking(nums);
+        return result;
+    }
+    private void backtracking(int[] nums) {
+        if (path.size() == nums.length) {
+            result.add(new ArrayList<>(path));
+            return;
+        }
+        for (int num: nums) {
+            if (path.contains(num)) continue;
+            path.add(num);
+            backtracking(nums);
+            path.removeLast();
+        }
+    }
+}
+```
 ## 77 组合 middle
 ```
 给定两个整数 n 和 k，返回范围 [1, n] 中所有可能的 k 个数的组合。
@@ -2795,36 +2893,97 @@ class Solution {
     }
 }
 ```
+## 78 子集 middle
+```
+给你一个整数数组 nums ，数组中的元素 互不相同 。返回该数组所有可能的子集（幂集）。
+
+解集 不能 包含重复的子集。你可以按 任意顺序 返回解集。
+```
+思路：基于77组合的解法，子集相当于从数组中找出0、1、2...length个组合
+```java
+class Solution {
+    List<List<Integer>> result = new ArrayList<>();
+    LinkedList<Integer> path = new LinkedList<>();
+    public List<List<Integer>> subsets(int[] nums) {
+        for (int i = 0; i <= nums.length; i++) {
+            backtracking(nums, i, 0);
+        }
+        return result;
+    }
+    private void backtracking(int[] nums, int k, int startIndex) {
+        if (path.size() == k) {
+            result.add(new ArrayList<>(path));
+            return;
+        }
+        for (int i = startIndex; i < nums.length - (k - path.size()) + 1; i++) {
+            path.add(nums[i]);
+            backtracking(nums, k, i + 1);
+            path.removeLast();
+        }
+    }
+}
+```
 ## 22 括号生成 middle
 ```
 数字 n 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 有效的 括号组合。
 ```
-思路：
+思路：暴力递归，长度为 n 的序列就是在长度为 n−1 的序列前加一个(或)。 为了检查序列是否有效，我们遍历这个序列，并使用一个变量 balance 表示左括号的数量减去右括号的数量。如果在遍历过程中 balance 的值小于零，或者结束时 balance 的值不为零，那么该序列就是无效的，否则它是有效的。
+```
+class Solution {
+    List<String> result = new ArrayList<String>();
+    public List<String> generateParenthesis(int n) {
+        generateAll(new char[2 * n], 0);
+        return result;
+    }
+
+    public void generateAll(char[] current, int pos) {
+        if (pos == current.length) {
+            if (valid(current)) {
+                result.add(new String(current));
+            }
+            return;
+        }
+        current[pos] = '(';
+        generateAll(current, pos + 1);
+        current[pos] = ')';
+        generateAll(current, pos + 1);
+    }
+
+    public boolean valid(char[] current) {
+        int balance = 0;
+        for (char c: current) {
+            if (c == '(') {
+                ++balance;
+            } else {
+                --balance;
+            }
+            if (balance < 0) {
+                return false;
+            }
+        }
+        return balance == 0;
+    }
+}
+```
+思路：回溯，left、right分别代表左右括号的数量，一开始都是0
+- 终止条件：左括号数量小于右括号或大于n直接剪枝，左右括号数量都等于n时收集结果
+- 单层递归：左括号数量小于n时说明还要补充(，右括号数量小于左括号时说明还要补充)
 ```java
 class Solution {
-  List<String> result = new ArrayList<>();
-  public List<String> generateParenthesis(int n) {
-    backtracking(n, 0, 0, "");
-    return result;
-  }
-
-  private void backtracking(int n, int left, int right, String str) {
-    if (right > left) {
-      return;
+    private List<String> result = new ArrayList<>();
+    public List<String> generateParenthesis(int n) {
+        backtracking(n, 0, 0, "");
+        return result;
     }
-    if (left == n && right == n) {
-      result.add(str);
-      return;
+    private void backtracking(int n, int l, int r, String str) {
+        if (l > n || l < r) return;
+        if (l == n && r == n) {
+            result.add(str);
+            return;
+        }
+        if (l < n) backtracking(n, l + 1, r, str + "(");
+        if (r < l) backtracking(n, l, r + 1, str + ")"); 
     }
-
-    if (left < n) {
-      backtracking(n, left + 1, right, str + "(");
-    }
-
-    if (right < left) {
-      backtracking(n, left, right + 1, str + ")");
-    }
-  }
 }
 ```
 
