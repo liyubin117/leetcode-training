@@ -1094,68 +1094,65 @@ int get(int key) 如果关键字 key 存在于缓存中，则返回关键字的�
 void put(int key, int value) 如果关键字 key 已经存在，则变更其数据值 value ；如果不存在，则向缓存中插入该组 key-value 。如果插入操作导致关键字数量超过 capacity ，则应该 逐出 最久未使用的关键字。
 函数 get 和 put 必须以 O(1) 的平均时间复杂度运行。
 ```
-应该用哈希表+双向链表的解法，更能体现考察的目标。get若有则先将节点移到头部再返回其值，put若无该元素则size+1，增加节点到头部，且若超出限制还删掉尾部节点，若有该元素则更新值并移到头部
+思路：应该用哈希表+双向链表的解法，更能体现考察的目标。get若有则先将节点移到头部再返回其值，put若无该元素则size+1，增加节点到头部，且若超出限制还删掉尾部节点，若有该元素则更新值并移到头部
 ```java
 //哈希表+双向链表
-public class LRUCache {
+class LRUCache {
     class DLinkedNode {
         int key;
         int value;
         DLinkedNode prev;
         DLinkedNode next;
         public DLinkedNode() {}
-        public DLinkedNode(int _key, int _value) {key = _key; value = _value;}
+        public DLinkedNode(int key, int value) {
+            this.key = key;
+            this.value = value;
+        }
     }
-
-    private Map<Integer, DLinkedNode> cache = new HashMap<Integer, DLinkedNode>();
     private int size;
-    private int capacity;
-    private DLinkedNode head, tail;
+    private final int capacity;
+    private final DLinkedNode head; //伪头部
+    private final DLinkedNode tail; //伪尾部
+    private final Map<Integer, DLinkedNode> hash = new HashMap<>();
 
     public LRUCache(int capacity) {
-        this.size = 0;
         this.capacity = capacity;
-        // 使用伪头部和伪尾部节点
-        head = new DLinkedNode();
-        tail = new DLinkedNode();
+        this.size = 0;
+        this.head = new DLinkedNode();
+        this.tail = new DLinkedNode();
         head.next = tail;
         tail.prev = head;
     }
-
+    
     public int get(int key) {
-        DLinkedNode node = cache.get(key);
-        if (node == null) {
-            return -1;
+        DLinkedNode find = hash.get(key);
+        if (find == null) return -1;
+        moveToHead(find);
+        return find.value;
+    }
+    
+    public void put(int key, int value) {
+        DLinkedNode find = hash.get(key);
+        if (find == null) { //若无该节点
+            ++size;
+            DLinkedNode newNode = new DLinkedNode(key, value); //生成新节点
+            hash.put(key, newNode); //添加到哈希表
+            addToHead(newNode); //添加到链表头部
+            if (this.size > capacity) { //若超过容量限制则删除真的尾节点
+                DLinkedNode tailNode = tail.prev;
+                deleteNode(tailNode);
+                hash.remove(tailNode.key);
+                --size; //注意减少容量
+            }
+        } else {
+            moveToHead(find); //若有该节点则将其移到头部
+            find.value = value; //注意只能改其值，而不能改链表结构
         }
-        // 如果 key 存在，先通过哈希表定位，再移到头部
-        moveToHead(node);
-        return node.value;
     }
 
-    public void put(int key, int value) {
-        DLinkedNode node = cache.get(key);
-        if (node == null) {
-            // 如果 key 不存在，创建一个新的节点
-            DLinkedNode newNode = new DLinkedNode(key, value);
-            // 添加进哈希表
-            cache.put(key, newNode);
-            // 添加至双向链表的头部
-            addToHead(newNode);
-            ++size;
-            if (size > capacity) {
-                // 如果超出容量，删除双向链表的尾部节点
-                DLinkedNode tailNode = tail.prev;
-                removeNode(tailNode);
-                // 删除哈希表中对应的项
-                cache.remove(tailNode.key);
-                --size;
-            }
-        }
-        else {
-            // 如果 key 存在，先通过哈希表定位，再修改 value，并移到头部
-            node.value = value;
-            moveToHead(node);
-        }
+    private void moveToHead(DLinkedNode node) {
+        deleteNode(node);
+        addToHead(node);
     }
 
     private void addToHead(DLinkedNode node) {
@@ -1165,14 +1162,9 @@ public class LRUCache {
         head.next = node;
     }
 
-    private void removeNode(DLinkedNode node) {
+    private void deleteNode(DLinkedNode node) {
         node.prev.next = node.next;
         node.next.prev = node.prev;
-    }
-
-    private void moveToHead(DLinkedNode node) {
-        removeNode(node);
-        addToHead(node);
     }
 }
 //继承内置类LinkedHashMap
@@ -2450,8 +2442,8 @@ class Solution {
     }
 }
 ```
-## 530 二叉搜索树的最小绝对差
-中序遍历
+## 530 二叉搜索树的最小绝对差 easy
+中序遍历+pre指针
 ```java
 //最简单的方法是中序遍历构造出一个递增的list，然后双指针移动比较得到最小绝对差。但这样性能比较差
 class Solution {
@@ -2486,7 +2478,7 @@ class Solution {
 }
 ```
 ## 501 二叉搜索树中的众数 easy
-中序遍历，全局变量：上一个节点pre、结果集list、当前节点的频率count、当前最大的频率maxCount。关键在于count和maxCount的比较
+中序遍历+pre指针，全局变量：上一个节点pre、结果集list、当前节点的频率count、当前最大的频率maxCount。关键在于count和maxCount的比较
 ```java
 class Solution {
     TreeNode pre = null;
@@ -2515,6 +2507,33 @@ class Solution {
         }
         pre = cur;
         recurse(cur.right); //右
+    }
+}
+```
+## 538 把二叉搜索树转换为累加树 middle
+```
+给出二叉 搜索 树的根节点，该树的节点值各不相同，请你将其转换为累加树（Greater Sum Tree），使每个节点 node 的新值等于原树中大于或等于 node.val 的值之和。
+
+提醒一下，二叉搜索树满足下列约束条件：
+节点的左子树仅包含键 小于 节点键的节点。
+节点的右子树仅包含键 大于 节点键的节点。
+左右子树也必须是二叉搜索树。
+注意：本题和 1038: https://leetcode-cn.com/problems/binary-search-tree-to-greater-sum-tree/ 相同
+```
+思路：递归右中左+pre，使用pre记录上一个累加值，然后与当前节点的值相加再赋值pre用于下一次累加
+```java
+class Solution {
+    private int pre = 0;
+    public TreeNode convertBST(TreeNode root) {
+        recurse(root);
+        return root;
+    }
+    private void recurse(TreeNode node) {
+        if (node == null) return;
+        recurse(node.right);
+        node.val += pre;
+        pre = node.val;
+        recurse(node.left);
     }
 }
 ```
@@ -2564,7 +2583,6 @@ class Solution {
 ## 230 二叉搜索树中第k小的元素 middle
 思路：
 - 最直观的是中序遍历后写到最小堆，然后取k次即结果
-- 
 ```java
 class Solution {
     PriorityQueue<Integer> queue = new PriorityQueue<>();
@@ -2598,11 +2616,12 @@ class Solution {
         if (root == null) return;
         recurse(root);
         root = new TreeNode(list.get(0).val);
-        TreeNode cur = root, newNext;
+        TreeNode pre, cur;
         for (int i = 1; i < list.size(); i++) {
-            TreeNode prev = list.get(i - 1), curr = list.get(i);
-            prev.left = null;
-            prev.right = curr;
+            pre = list.get(i - 1);
+            cur = list.get(i);
+            pre.left = null;
+            pre.right = cur;
         }
     }
     private void recurse(TreeNode node) {
@@ -2702,6 +2721,25 @@ class Solution {
             root.val = tmp.val;
             root.right = delete(root.right,tmp.val);
         }
+        return root;
+    }
+}
+```
+## 669 修剪二叉搜索树 middle
+```
+给你二叉搜索树的根节点 root ，同时给定最小边界low 和最大边界 high。通过修剪二叉搜索树，使得所有节点的值在[low, high]中。修剪树 不应该 改变保留在树中的元素的相对结构 (即，如果没有被移除，原有的父代子代关系都应当保留)。 可以证明，存在 唯一的答案 。
+
+所以结果应当返回修剪好的二叉搜索树的新的根节点。注意，根节点可能会根据给定的边界发生改变。
+```
+思路：递归前序遍历。对于当前根节点，若为空则返回空，若小于左界则返回修剪右子树后的根节点，若大于右界则返回修剪左子树后的根节点，再以此遍历左、右子树赋值当前根节点
+```java
+class Solution {
+    public TreeNode trimBST(TreeNode root, int low, int high) {
+        if (root == null) return null;
+        if (root.val < low) return trimBST(root.right, low, high);
+        if (root.val > high) return trimBST(root.left, low, high);
+        root.left = trimBST(root.left, low, high);
+        root.right = trimBST(root.right, low, high);
         return root;
     }
 }
@@ -2858,7 +2896,63 @@ class Solution {
 ```
 
 # 动态规划
+## 509 斐波那契数 easy
+```
+斐波那契数 （通常用 F(n) 表示）形成的序列称为 斐波那契数列 。该数列由 0 和 1 开始，后面的每一项数字都是前面两项数字的和。也就是：
 
+F(0) = 0，F(1) = 1
+F(n) = F(n - 1) + F(n - 2)，其中 n > 1
+给定 n ，请计算 F(n) 。
+```
+思路：递归或动态规划
+```java
+//暴力递归，O(2^N)，对本例来说效率低，存在重复计算
+class Solution {
+  public int fib(int n) {
+    if (n == 0 || n == 1) return n;
+    return fib(n - 1) + fib(n - 2);
+  }
+}
+//自顶向下DP，备忘录优化，消除重叠子问题 时间复杂度O(N) 空间复杂度O(N)
+class Solution {
+    public int fib(int n) {
+        int[] dp = new int[n + 1]; //备忘录
+        return func(dp, n);
+    }
+    private int func(int[] dp, int N) {
+        if (N == 0 || N == 1) return N; //base case
+        if (dp[N] != 0) return dp[N]; //若备忘录已经计算过则直接返回不重复计算
+        dp[N] = func(dp, N - 1) + func(dp, N - 2);
+        return dp[N];  
+    }
+}
+//自底向上DP 时间复杂度O(N) 空间复杂度O(N)
+class Solution {
+    public int fib(int n) {
+        if (n == 0 || n == 1) return n;
+        int[] dp = new int[n + 1];
+        dp[0] = 0;
+        dp[1] = 1;
+        for (int i = 2; i <= n; i++) {
+            dp[i] = dp[i - 1] + dp[i - 2];
+        }
+        return dp[n];
+    }
+}
+//优化后的自底向上DP 时间复杂度O(N) 空间复杂度O(1)
+class Solution {
+    public int fib(int n) {
+        if (n == 0 || n == 1) return n;
+        int pre = 0, cur = 1, newCur;
+        for (int i = 2; i <= n; i++) {
+            newCur = pre + cur;
+            pre = cur;
+            cur = newCur;
+        }
+        return cur;
+    }
+}
+```
 ## 70 爬楼梯 easy
 ```
 假设你正在爬楼梯。需要 n 阶你才能到达楼顶。
@@ -2950,17 +3044,64 @@ class Solution {
 
 你可以认为每种硬币的数量是无限的。
 ```
-思路：动态规划
+思路：自顶向下DP
+- 状态：目标金额amount
+- 选择：会导致状态变化，从coins中选择
+- 函数定义：凑出总金额amount，至少需求coinChange(coins, amount)枚硬币
+- base case: amount==0时需要0枚，<0时不可能凑出
+```java
+//存在重复子问题，O(2^N) O(1)
+class Solution {
+    public int coinChange(int[] coins, int amount) {
+        //base case
+        if (amount == 0) return 0;
+        if (amount < 0) return -1;
+
+        int res = Integer.MAX_VALUE;
+        for (int coin: coins) {
+            int subProblem = coinChange(coins, amount - coin); //子问题的结果
+            if (subProblem == -1) continue; //子问题无解则直接忽略
+            res = Math.min(res, subProblem + 1); //在子问题中找最优解然后加1
+        }
+        return res == Integer.MAX_VALUE ? -1 : res;
+    }
+}
+//备忘录优化 O(N*K) O(N)
+class Solution {
+  int[] memo; //备忘录
+  public int coinChange(int[] coins, int amount) {
+    memo = new int[amount + 1];
+    Arrays.fill(memo, -111);
+    return dp(coins, amount);
+  }
+  private int dp(int[] coins, int amount) {
+    //base case
+    if (amount == 0) return 0;
+    if (amount < 0) return -1;
+
+    if (memo[amount] != -111) return memo[amount]; //查备忘录防止重复计算
+
+    int res = Integer.MAX_VALUE;
+    for (int coin: coins) {
+      int subProblem = dp(coins, amount - coin); //子问题的结果
+      if (subProblem == -1) continue; //子问题无解则直接忽略
+      res = Math.min(res, subProblem + 1); //在子问题中找最优解然后加1
+    }
+    memo[amount] = res == Integer.MAX_VALUE ? -1 : res; //更新备忘录
+    return memo[amount];
+  }
+}
+```
+思路：自底向上DP，迭代
 ```java
 public class Solution {
     public int coinChange(int[] coins, int amount) {
-        int max = amount + 1;
         int[] dp = new int[amount + 1];
-        Arrays.fill(dp, max);
+        Arrays.fill(dp, amount + 1);
         dp[0] = 0;
         for (int i = 1; i <= amount; i++) {
             for (int j = 0; j < coins.length; j++) {
-                if (coins[j] <= i) {
+                if (i - coins[j] >= 0) {
                     dp[i] = Math.min(dp[i], dp[i - coins[j]] + 1);
                 }
             }
