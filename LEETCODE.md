@@ -2893,6 +2893,129 @@ class Solution {
     }
 }
 ```
+## 216 组合总和3 middle
+```
+找出所有相加之和为 n 的 k 个数的组合，且满足下列条件：
+只使用数字1到9
+每个数字 最多使用一次 
+
+返回 所有可能的有效组合的列表 。该列表不能包含相同的组合两次，组合可以以任何顺序返回。
+```
+思路：回溯
+- 终止条件：path元素个数满足k，且此时的sum满足targetSum，则加到result返回
+- 单层递归：从startIndex开始递增到9，循环添加到path，增加sum，进行递归后回滚。可剪枝优化，startIndex递增到9-(k-path.size())+1即可，不然会递归无法满足k个元素的情况
+```java
+class Solution {
+    List<List<Integer>> result = new ArrayList<>();
+    LinkedList<Integer> path = new LinkedList<>();
+    public List<List<Integer>> combinationSum3(int k, int n) {
+        backtracking(k, n, 0, 1);
+        return result;
+    }
+    private void backtracking(int k, int targetSum, int sum, int startIndex) {
+        if (path.size() == k) {
+            if (targetSum == sum) result.add(new ArrayList<>(path));
+            return;
+        }
+        for (int i = startIndex; i <= 10 - (k - path.size()); i++) {
+            sum += i;
+            path.add(i);
+            backtracking(k, targetSum, sum, i + 1);
+            sum -= i;
+            path.removeLast();
+        }
+    }
+}
+```
+## 17 电话号码的字母组合 middle
+```
+给定一个仅包含数字 2-9 的字符串，返回所有它能表示的字母组合。答案可以按 任意顺序 返回。
+
+给出数字到字母的映射如下（与电话按键相同）。注意 1 不对应任何字母。
+```
+思路：回溯
+- 入参出参：出参都是void，入参是digits和index，每次递归是从digits字符串的index索引处开始计算
+- 终止条件：index达到digits长度的索引位置，说明此时已经完成传入的digits的遍历，达到叶节点，可收集结果
+- 单层递归：digits在index索引位置的数字代表的如abc、def等，这个决定了本轮递归的多叉树的宽度，深度由digits剩下的数字决定，所以在进行下一轮递归时index+1
+```java
+class Solution {
+    List<String> result = new ArrayList<String>();
+    StringBuffer path = new StringBuffer();
+    Map<Character, String> phoneMap = new HashMap<Character, String>() {{
+        put('2', "abc");
+        put('3', "def");
+        put('4', "ghi");
+        put('5', "jkl");
+        put('6', "mno");
+        put('7', "pqrs");
+        put('8', "tuv");
+        put('9', "wxyz");
+    }};
+    public List<String> letterCombinations(String digits) {
+        if (digits.length() == 0) return result;
+        backtrack(digits, 0);
+        return result;
+    }
+
+    public void backtrack(String digits, int index) {
+        if (index == digits.length()) {
+            result.add(path.toString());
+        } else {
+            char digit = digits.charAt(index);
+            String letters = phoneMap.get(digit);
+            int lettersCount = letters.length();
+            for (int i = 0; i < lettersCount; i++) {
+                path.append(letters.charAt(i));
+                backtrack(digits, index + 1);
+                path.deleteCharAt(index);
+            }
+        }
+    }
+}
+```
+## 39 组合总和 middle
+```
+给你一个 无重复元素 的整数数组 candidates 和一个目标整数 target ，找出 candidates 中可以使数字和为目标数 target 的 所有 不同组合 ，并以列表形式返回。你可以按 任意顺序 返回这些组合。
+
+candidates 中的 同一个 数字可以 无限制重复被选取 。如果至少一个数字的被选数量不同，则两种组合是不同的。 
+
+对于给定的输入，保证和为 target 的不同组合数少于 150 个。
+```
+思路：先对candidates排序，这样可以提前剪枝防止不必要的回溯法的宽度增加。可以用target-candidates[i]作为新的target传给下一轮递归，这样可以避免sum变量的定义
+- 终止条件：target == 0说明此时的和已经满足要求，收集结果
+- 单层递归：对candidates从startIndex索引处开始遍历，先剪枝：若此时target-candidates[i]已小于0直接return，然后更新path，进行回溯递归，撤销更新path
+```java
+class Solution {
+    List<List<Integer>> result = new ArrayList<>(); // 结果列表（子集列表）
+    List<Integer> path = new ArrayList<>(); // 状态（子集）
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        Arrays.sort(candidates); // 对 candidates 进行排序
+        backtrack(target, candidates, 0);
+        return result;
+    }
+    void backtrack(int target, int[] candidates, int startIndex) {
+        // 子集和等于 target 时，记录解
+        if (target == 0) {
+            result.add(new ArrayList<>(path));
+            return;
+        }
+        // 遍历所有选择
+        // 剪枝二：从 startIndex 开始遍历，避免生成重复子集
+        for (int i = startIndex; i < candidates.length; i++) {
+            // 剪枝一：若子集和超过 target ，则直接结束循环
+            // 这是因为数组已排序，后边元素更大，子集和一定超过 target
+            if (target - candidates[i] < 0) return;
+            // 尝试：做出选择，更新 target, startIndex
+            path.add(candidates[i]);
+            // 进行下一轮选择
+            backtrack(target - candidates[i], candidates, i);
+            // 回退：撤销选择，恢复到之前的状态
+            path.remove(path.size() - 1);
+        }
+    }
+}
+```
+
 ## 78 子集 middle
 ```
 给你一个整数数组 nums ，数组中的元素 互不相同 。返回该数组所有可能的子集（幂集）。
