@@ -27,10 +27,8 @@ class Solution {
             return;
         }
         for (int i = startIndex; i <= 10 - (k - path.size()); i++) {
-            sum += i;
             path.add(i);
-            backtracking(k, targetSum, sum, i + 1);
-            sum -= i;
+            backtracking(k, targetSum, sum + i, i + 1);
             path.removeLast();
         }
     }
@@ -70,15 +68,12 @@ class Solution {
     public void backtrack(String digits, int index) {
         if (index == digits.length()) {
             result.add(path.toString());
-        } else {
-            char digit = digits.charAt(index);
-            String letters = phoneMap.get(digit);
-            int lettersCount = letters.length();
-            for (int i = 0; i < lettersCount; i++) {
-                path.append(letters.charAt(i));
-                backtrack(digits, index + 1);
-                path.deleteCharAt(index);
-            }
+            return;
+        }
+        for (char ch: phoneMap.get(digits.charAt(index)).toCharArray()) {
+            path.append(ch);
+            backtrack(digits, index + 1);
+            path.deleteCharAt(index);
         }
     }
 }
