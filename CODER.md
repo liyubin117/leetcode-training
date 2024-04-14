@@ -293,9 +293,10 @@ m大于等于3，小于等于14，即在蔡勒公式中，某年的1,2月份要�
 * T[] Arrays.copyOfRange(T[], from, to) 返回一个原数组从包含from到不包含to的数组
 * list.stream().mapToInt(Integer::intValue).toArray() 将一个List<Integer>转换成int[]
 * set.stream().mapToInt(Integer::intValue).toArray() 将一个Set<Integer>转换成int[]
+* list.size() 获取大小。如果是int[] arr数组，则是arr.length，如果是String str字符串，则是str.length()
 * list.remove() 当传入参数是int型时认为是删除某索引的值，传入Object引用型时删除对应的对象
-  * list.remove(1) 删除1索引的值
-  * list.remove(Integer.valueOf(1)) 删除1对象
+  - list.remove(1) 删除1索引的值
+  - list.remove(Integer.valueOf(1)) 删除1对象
 * Integer.toBinaryString()
 * Integer.bitCount() 二进制1的数量
 * Integer.reverse() 颠倒二进制数

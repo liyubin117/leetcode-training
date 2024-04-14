@@ -1433,6 +1433,42 @@ class Solution {
 ```
 
 # 字符串
+## 125 验证回文串 easy
+```
+如果在将所有大写字符转换为小写字符、并移除所有非字母数字字符之后，短语正着读和反着读都一样。则可以认为该短语是一个 回文串 。
+
+字母和数字都属于字母数字字符。
+
+给你一个字符串 s，如果它是 回文串 ，返回 true ；否则，返回 false 。
+```
+思路：
+- 对字符串正则处理后双指针
+- 直接双指针，移动指针时用Character.isLetterOrDigit判断是否非字母数字空格
+```
+//第一种
+class Solution {
+    public boolean isPalindrome(String s) {
+        String str = s.toLowerCase().replaceAll("[^a-z0-9]", "");
+        for (int l = 0, r = str.length() - 1; l < r; l++, r--) {
+            if (str.charAt(l) != str.charAt(r)) return false;
+        }
+        return true;
+    }
+}
+//第二种
+class Solution {
+    public boolean isPalindrome(String s) {
+        for (int l = 0, r = s.length() - 1; l < r; l++, r--) {
+            while (l < r && !Character.isLetterOrDigit(s.charAt(l))) ++l;
+            while (l < r && !Character.isLetterOrDigit(s.charAt(r))) --r;
+            if (l < r) {
+                if (Character.toLowerCase(s.charAt(l)) != Character.toLowerCase(s.charAt(r))) return false;
+            }
+        }
+        return true;
+    }
+}
+```
 ## 344 反转字符串 easy 
 双指针
 ```
@@ -2918,10 +2954,8 @@ class Solution {
             return;
         }
         for (int i = startIndex; i <= 10 - (k - path.size()); i++) {
-            sum += i;
             path.add(i);
-            backtracking(k, targetSum, sum, i + 1);
-            sum -= i;
+            backtracking(k, targetSum, sum + i, i + 1);
             path.removeLast();
         }
     }
@@ -2960,15 +2994,12 @@ class Solution {
     public void backtrack(String digits, int index) {
         if (index == digits.length()) {
             result.add(path.toString());
-        } else {
-            char digit = digits.charAt(index);
-            String letters = phoneMap.get(digit);
-            int lettersCount = letters.length();
-            for (int i = 0; i < lettersCount; i++) {
-                path.append(letters.charAt(i));
-                backtrack(digits, index + 1);
-                path.deleteCharAt(index);
-            }
+            return;
+        }
+        for (char ch: phoneMap.get(digits.charAt(index)).toCharArray()) {
+            path.append(ch);
+            backtrack(digits, index + 1);
+            path.deleteCharAt(index);
         }
     }
 }
@@ -2999,23 +3030,95 @@ class Solution {
             result.add(new ArrayList<>(path));
             return;
         }
-        // 遍历所有选择
         // 剪枝二：从 startIndex 开始遍历，避免生成重复子集
         for (int i = startIndex; i < candidates.length; i++) {
-            // 剪枝一：若子集和超过 target ，则直接结束循环
-            // 这是因为数组已排序，后边元素更大，子集和一定超过 target
+            // 剪枝一：若子集和超过 target ，则直接结束循环。这是因为数组已排序，后边元素更大，子集和一定超过 target
             if (target - candidates[i] < 0) return;
-            // 尝试：做出选择，更新 target, startIndex
             path.add(candidates[i]);
-            // 进行下一轮选择
             backtrack(target - candidates[i], candidates, i);
-            // 回退：撤销选择，恢复到之前的状态
             path.remove(path.size() - 1);
         }
     }
 }
 ```
+## 40 组合总和2 middle
+```
+给定一个候选人编号的集合 candidates 和一个目标数 target ，找出 candidates 中所有可以使数字和为 target 的组合。
 
+candidates 中的每个数字在每个组合中只能使用 一次 。
+
+注意：解集不能包含重复的组合。 
+```
+思路：与39的区别是candidates中存在重复元素！解决方法是排序后将相邻的元素放在一块，然后对树层去重。如[1,1,2],target=3.回溯往更深层递归时，重复的元素是可以的，而增加宽度时，由于之前的递归已经产生了1,2，此时若再选择第二个1，必然会产生与之前重复的结果，所以在一开始就树层剪枝去重
+```java
+class Solution {
+    List<List<Integer>> result = new ArrayList<>();
+    List<Integer> path = new ArrayList<>();
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+        Arrays.sort(candidates); // 对 candidates 进行排序
+        backtracking(candidates, target, 0);
+        return result;
+    }
+    void backtracking(int[] candidates, int target, int startIndex) {
+        // 子集和等于 target 时，记录解
+        if (target == 0) {
+            result.add(new ArrayList<>(path));
+            return;
+        }
+        // 剪枝一：从 startIndex 开始遍历，避免生成重复子集。从 startIndex 开始遍历，避免重复选择同一元素
+        for (int i = startIndex; i < candidates.length; i++) {
+            // 剪枝二：若子集和超过 target ，则直接结束循环。这是因为数组已排序，后边元素更大，子集和一定超过 target
+            if (target - candidates[i] < 0) {
+                break;
+            }
+            // 剪枝三：如果该元素与左边元素相等，说明该搜索分支重复，直接跳过
+            if (i > startIndex && candidates[i] == candidates[i - 1]) {
+                continue;
+            }
+            path.add(candidates[i]);
+            backtracking(candidates, target - candidates[i], i + 1);
+            path.remove(path.size() - 1);
+        }
+    }
+}
+```
+## 131 分割回文串 middle
+```
+给你一个字符串 s，请你将 s 分割成一些子串，使每个子串都是回文串。返回 s 所有可能的分割方案。
+```
+思路：startIndex即本次递归的切割线，0代表第0个元素后切割，由于i代表着切割线不断后移，因此此时切割的子串是s.substring(startIndex, i + 1)。使用双指针判断回文
+```java
+class Solution {
+    List<List<String>> result = new ArrayList<>();
+    Deque<String> path = new LinkedList<>();
+    public List<List<String>> partition(String s) {
+        backtracking(s, 0);
+        return result;
+    }
+    private void backtracking(String s, int startIndex) { //startIndex即切割线，0代表第0个元素后切割
+        if (startIndex >= s.length()) {
+            result.add(new ArrayList<>(path));
+            return;
+        }
+        for (int i = startIndex; i < s.length(); i++) {
+            //startIndex代表着本次递归的初始切割线，由于i代表着切割线不断后移，因此此时切割的子串是s.substring(startIndex, i + 1)
+            if (isPalindrome(s, startIndex, i)) {
+                path.add(s.substring(startIndex, i + 1));
+            } else {
+                continue;
+            }
+            backtracking(s, i + 1);
+            path.removeLast();
+        }
+    }
+    private boolean isPalindrome(String s, int startIndex, int end) { //双指针判断回文
+        for (int i = startIndex, j = end; i < j; i++, j--) {
+            if (s.charAt(i) != s.charAt(j)) return false;
+        }
+        return true;
+    }
+}
+```
 ## 78 子集 middle
 ```
 给你一个整数数组 nums ，数组中的元素 互不相同 。返回该数组所有可能的子集（幂集）。
@@ -3106,6 +3209,40 @@ class Solution {
         }
         if (l < n) backtracking(n, l + 1, r, str + "(");
         if (r < l) backtracking(n, l, r + 1, str + ")"); 
+    }
+}
+```
+# 贪心法
+## 680 验证回文串 easy
+```
+给你一个字符串 s，最多 可以从中删除一个字符。
+
+请你判断 s 是否能成为回文字符串：如果能，返回 true ；否则，返回 false 。
+```
+思路：在允许最多删除一个字符的情况下，同样可以使用双指针，通过贪心实现。初始化两个指针 low 和 high 分别指向字符串的第一个字符和最后一个字符。每次判断两个指针指向的字符是否相同，如果相同，则更新指针，将 low 加 1，high 减 1，然后判断更新后的指针范围内的子串是否是回文字符串。如果两个指针指向的字符不同，则两个字符中必须有一个被删除，此时我们就分成两种情况：即删除左指针对应的字符，留下子串 s[low+1:high]，或者删除右指针对应的字符，留下子串 s[low:high−1]。当这两个子串中至少有一个是回文串时，就说明原始字符串删除一个字符之后就以成为回文串。
+```java
+class Solution {
+    public boolean validPalindrome(String s) {
+        int low = 0, high = s.length() - 1;
+        while (low < high) {
+            char c1 = s.charAt(low), c2 = s.charAt(high);
+            if (c1 == c2) {
+                ++low;
+                --high;
+            } else {
+                return validate(s, low, high - 1) || validate(s, low + 1, high);
+            }
+        }
+        return true;
+    }
+    private boolean validate(String s, int low, int high) {
+        for (int i = low, j = high; i < j; ++i, --j) {
+            char c1 = s.charAt(i), c2 = s.charAt(j);
+            if (c1 != c2) {
+                return false;
+            }
+        }
+        return true;
     }
 }
 ```
