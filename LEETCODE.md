@@ -21,7 +21,26 @@ class Solution {
 给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
 请注意 ，必须在不复制数组的情况下原地对数组进行操作。
 ```
-思路：快慢指针，慢指针指向当前已经处理好的序列的尾部，快指针指向待处理序列的头部。快指针不断向右移动，每次快指针指向非零数，则将快慢指针对应的数交换，同时慢指针右移。
+思路：
+* 快慢指针，基于27解法，只是多了一个slow后的元素置0的过程，更容易理解
+```java
+class Solution {
+    public void moveZeroes(int[] nums) {
+        int slow = 0, fast = 0;
+        while (fast < nums.length) {
+            if (nums[fast] != 0) {
+                nums[slow] = nums[fast];
+                slow++;
+            }
+            fast++;
+        }
+        while (slow < nums.length) {
+            nums[slow++] = 0;
+        }
+    }
+}
+```
+* 快慢指针，慢指针指向当前已经处理好的序列的尾部，快指针指向待处理序列的头部。快指针不断向右移动，每次快指针指向非零数，则将快慢指针对应的数交换，同时慢指针右移。
 - 慢指针左边均为非零数
 - 快指针左边直到慢指针处均为零
 ```java
@@ -54,10 +73,10 @@ class Solution {
 
 必须 原地 修改，只允许使用额外常数空间。
 ```
-思路：双指针
+思路：双指针。先从右往左找出第一个递增的元素，此为较小值，位置记为i，再从右往左找出第一个比它大的元素即较大值，位置记为j，调换位置，再将i之后的元素调换
 ```java
 class Solution {
-    //先从右往左找出第一个非递增的元素，此为较小值，位置记为i，再从右往左找出第一个比它大的元素即较大值，位置记为j，调换位置，再将i之后的元素按字典序排序
+    //先从右往左找出第一个递增的元素，此为较小值，位置记为i，再从右往左找出第一个比它大的元素即较大值，位置记为j，调换位置，再将i之后的元素按字典序排序
     public void nextPermutation(int[] nums) {
         int i = nums.length - 2;
         while (i >= 0 && nums[i] >= nums[i + 1]) {
@@ -82,9 +101,7 @@ class Solution {
     public void reverse(int[] nums, int start) {
         int left = start, right = nums.length - 1;
         while (left < right) {
-            swap(nums, left, right);
-            left++;
-            right--;
+            swap(nums, left++, right--);
         }
     }
 }
@@ -112,6 +129,36 @@ class Solution {
     }
 }
 ```
+## 153 寻找旋转排序数组中的最小值 middle
+```
+已知一个长度为 n 的数组，预先按照升序排列，经由 1 到 n 次 旋转 后，得到输入数组。例如，原数组 nums = [0,1,2,4,5,6,7] 在变化后可能得到：
+若旋转 4 次，则可以得到 [4,5,6,7,0,1,2]
+若旋转 7 次，则可以得到 [0,1,2,4,5,6,7]
+注意，数组 [a[0], a[1], a[2], ..., a[n-1]] 旋转一次 的结果为数组 [a[n-1], a[0], a[1], a[2], ..., a[n-2]] 。
+
+给你一个元素值 互不相同 的数组 nums ，它原来是一个升序排列的数组，并按上述情形进行了多次旋转。请你找出并返回数组中的 最小元素 。
+
+你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。
+```
+思路：二分查找，考虑数组中的最后一个元素 x：在最小值右侧的元素（不包括最后一个元素本身），它们的值一定都严格小于 x；而在最小值左侧的元素，它们的值一定都严格大于 x。因此，我们可以根据这一条性质，通过二分查找的方法找出最小值
+- 如果中间节点大于最右节点，说明中间节点在左递增区间，最小值在mid右边
+- 如果中间节点小于等于最右节点，说明最小值和mid都在右递增区间，最小值在mid左边或就是mid本身
+```java
+class Solution {
+    public int findMin(int[] nums) {
+        int n = nums.length, l = 0, r = n - 1;
+        while (l < r) {
+            int mid = l + (r - l) / 2;
+            if (nums[n - 1] < nums[mid]) {
+                l = mid + 1;
+            } else {
+                r = mid;
+            }
+        }
+        return nums[l];
+    }
+}
+```
 ## 33 搜索旋转排序数组 middle
 ```
 整数数组 nums 按升序排列，数组中的值 互不相同 。
@@ -123,31 +170,31 @@ class Solution {
 你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。
 ```
 思路：
-- 在常规二分查找的时候查看当前 mid 为分割位置分割出来的两个部分 [l, mid] 和 [mid + 1, r] 哪个部分是有序的，并根据有序的那个部分确定我们该如何改变二分查找的上下界，因为我们能够根据有序的那部分判断出 target 在不在这个部分。根据nums[0]与中间元素比较，若小于等于则target必在左半段，大于则在右半段
-  - 如果 [l, mid - 1] 是有序数组，且 target 的大小满足 [nums[l],nums[mid])，则我们应该将搜索范围缩小至 [l, mid - 1]，否则在 [mid + 1, r] 中寻找。
-  - 如果 [mid, r] 是有序数组，且 target 的大小满足 (nums[mid],nums[r]]，则我们应该将搜索范围缩小至 [mid + 1, r]，否则在 [l, mid - 1] 中寻找。
-- 将数组分隔成两个排序数组，然后分别二分查找。但这样并不是严格O(logN)，极端情况是O(N)
+* 在常规二分查找的时候查看当前 mid 为分割位置分割出来的两个部分 [l, mid] 和 [mid + 1, r] 哪个部分是有序的，并根据有序的那个部分确定我们该如何改变二分查找的上下界
+  - 根据最后一个元素与中间元素比较，若小于则mid必在左半段，大于则mid在右半段
+  - mid在左半段时，mid的左边即[l, mid - 1] 必是有序数组，若 target 的大小满足 [nums[l],nums[mid])，则我们应该将搜索范围缩小至 [l, mid - 1]，否则在 [mid + 1, r] 中寻找。
+  - mid在右半段时，mid的右边即[mid, r] 必是有序数组，且 target 的大小满足 (nums[mid],nums[r]]，则我们应该将搜索范围缩小至 [mid + 1, r]，否则在 [l, mid - 1] 中寻找。
+* 将数组分隔成两个排序数组，然后分别二分查找。但这样并不是严格O(logN)，极端情况是O(N)
 ```java
 //第一种
 class Solution {
-  public int search(int[] nums, int target) {
-    int n = nums.length;
-    if (n == 0) return -1;
-    if (n == 1) return nums[0] == target ? 0 : -1;
-    int l = 0, r = n - 1;
-    while (l <= r) {
-      int mid = (l + r) / 2;
-      if (nums[mid] == target) return mid;
-      if (nums[0] <= nums[mid]) {
-        if (nums[l] <= target && target < nums[mid]) r = mid - 1;
-        else l = mid + 1;
-      } else {
-        if (nums[mid] < target && target <= nums[n - 1]) l = mid + 1;
-        else r = mid - 1;
-      }
+    public int search(int[] nums, int target) {
+        int n = nums.length;
+        if (n == 1) return nums[0] == target ? 0 : -1;
+        int l = 0, r = n - 1, mid;
+        while (l <= r) {
+            mid = l + (r - l) / 2;
+            if (nums[mid] == target) return mid;
+            if (nums[n - 1] < nums[mid]) {
+                if (nums[l] <= target && target < nums[mid]) r = mid - 1;
+                else l = mid + 1;
+            } else {
+                if (nums[mid] < target && target <= nums[n - 1]) l = mid + 1;
+                else r = mid - 1;
+            }
+        }
+        return -1;
     }
-    return -1;
-  }
 }
 //第二种
 class Solution {
@@ -174,37 +221,6 @@ class Solution {
     }
 }
 ```
-## 153 寻找旋转排序数组中的最小值 middle
-```
-已知一个长度为 n 的数组，预先按照升序排列，经由 1 到 n 次 旋转 后，得到输入数组。例如，原数组 nums = [0,1,2,4,5,6,7] 在变化后可能得到：
-若旋转 4 次，则可以得到 [4,5,6,7,0,1,2]
-若旋转 7 次，则可以得到 [0,1,2,4,5,6,7]
-注意，数组 [a[0], a[1], a[2], ..., a[n-1]] 旋转一次 的结果为数组 [a[n-1], a[0], a[1], a[2], ..., a[n-2]] 。
-
-给你一个元素值 互不相同 的数组 nums ，它原来是一个升序排列的数组，并按上述情形进行了多次旋转。请你找出并返回数组中的 最小元素 。
-
-你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。
-```
-思路：二分查找，考虑数组中的最后一个元素 x：在最小值右侧的元素（不包括最后一个元素本身），它们的值一定都严格小于 x；而在最小值左侧的元素，它们的值一定都严格大于 x。因此，我们可以根据这一条性质，通过二分查找的方法找出最小值
-- 如果中间节点小于最右节点，说明最小值在左侧
-- 如果中间节点大于等于最右节点，说明最小值在右侧
-```java
-class Solution {
-    public int findMin(int[] nums) {
-        int left = 0;
-        int right = nums.length - 1;
-        while (left < right) {
-            int mid = left + (right - left) / 2;
-            if (nums[mid] < nums[right]) {
-                right = mid;
-            } else {
-                left = mid + 1;
-            }
-        }
-        return nums[left];
-    }
-}
-```
 ## 34 在排序数组中查找元素的第一个和最后一个位置 middle
 ```
 给你一个按照非递减顺序排列的整数数组 nums，和一个目标值 target。请你找出给定目标值在数组中的开始位置和结束位置。
@@ -219,22 +235,21 @@ class Solution {
 ```java
 //第一种
 class Solution {
-  public int[] searchRange(int[] nums, int target) {
-    int l = 0, r = nums.length - 1, mid, one, two;
-    int[] result = new int[2];
-    while (l <= r) {
-      mid = l + (r - l) / 2;
-      if (nums[mid] == target) {
-        one = two = mid;
-        while (one - 1 >= 0 && nums[one - 1] == target) one--;
-        while (two + 1 <= nums.length - 1 && nums[two + 1] == target) two++;
-        return new int[]{one, two};
-      }
-      else if (nums[mid] < target) l = mid + 1;
-      else r = mid - 1;
+    public int[] searchRange(int[] nums, int target) {
+        int n = nums.length, l = 0, r = n - 1;
+        while (l <= r) {
+            int mid = l + (r - l) / 2;
+            if (nums[mid] == target) {
+                l = r = mid;
+                while (l - 1 >= 0 && nums[l - 1] == nums[l]) l--;
+                while (r + 1 < n && nums[r + 1] == nums[r]) r++;
+                return new int[]{l, r};
+            }
+            if (nums[mid] < target) l = mid + 1;
+            else r = mid - 1;
+        }
+        return new int[]{-1, -1};
     }
-    return new int[]{-1, -1};
-  }
 }
 //第二种
 class Solution {
@@ -282,8 +297,31 @@ class Solution {
     }
 }
 ```
+## 88 合并两个有序数组 easy
+```
+给你两个按 非递减顺序 排列的整数数组 nums1 和 nums2，另有两个整数 m 和 n ，分别表示 nums1 和 nums2 中的元素数目。
+
+请你 合并 nums2 到 nums1 中，使合并后的数组同样按 非递减顺序 排列。
+
+注意：最终，合并后数组不应由函数返回，而是存储在数组 nums1 中。为了应对这种情况，nums1 的初始长度为 m + n，其中前 m 个元素表示应合并的元素，后 n 个元素为 0 ，应忽略。nums2 的长度为 n 。
+```
+思路：逆向双指针。由于nums1数组的后半部分是空的，可以直接覆盖而不影响结果。因此可以指针设置为从后向前遍历，每次取两者之中的较大者放进 nums1 的最后面
+```
+class Solution {
+    public void merge(int[] nums1, int m, int[] nums2, int n) {
+        int p = m - 1, q = n - 1, tail = m + n - 1, cur = 0;
+        while (p >= 0 || q >= 0) {
+            if (p == -1) cur = nums2[q--];
+            else if (q == -1) cur = nums1[p--];
+            else if (nums1[p] > nums2[q]) cur = nums1[p--];
+            else cur = nums2[q--];
+            nums1[tail--] = cur;
+        }
+    }
+}
+```
 ## 15 三数之和且不可出现重复三元组 middle 
-先排序，固定一个点i后双指针left/right，再移动这个点，要注意去重
+思路：先排序，固定一个点i后双指针left/right，再移动这个点，要注意剪枝和去重a/b/c
 ```java
 class Solution {
     public List<List<Integer>> threeSum(int[] nums) {
@@ -371,7 +409,7 @@ public class Solution {
 public class Solution {
     public int subarraySum(int[] nums, int k) {
         int count = 0, pre = 0;
-        HashMap < Integer, Integer > hash = new HashMap < > ();
+        HashMap <Integer, Integer> hash = new HashMap<>();
         hash.put(0, 1);
         for (int i = 0; i < nums.length; i++) {
             pre += nums[i];
@@ -421,10 +459,8 @@ class Solution {
 给定一个整数数组 nums，将数组中的元素向右轮转 k 个位置，其中 k 是非负数。
 ```
 思路：
-- 使用额外数组，新的索引是(i + k) % length
-- 直接翻转，先将所有元素翻转，这样尾部的 k % length 个元素就被移至数组头部，然后我们再翻转 [0, k - 1] 区间的元素、[k, length - 1]区间的元素即能得到最后的答案
+* 使用额外数组，新的索引是(i + k) % length
 ```java
-//使用额外数组，新的索引是(i + k) % length
 class Solution {
     public void rotate(int[] nums, int k) {
         int length = nums.length;
@@ -437,7 +473,9 @@ class Solution {
         }
     }
 }
-//不使用额外数组
+```
+* 不使用额外数组，直接翻转，有效的移动次数是k % length，先将所有元素翻转，这样尾部的 k % length 个元素就被移至数组头部，然后我们再翻转 [0, k - 1] 区间的元素、[k, length - 1]区间的元素即能得到最后的答案
+```java
 class Solution {
     public void rotate(int[] nums, int k) {
         k %= nums.length;
@@ -552,28 +590,6 @@ class Solution {
     }
 }
 ```
-## 121 买卖股票的最佳时机 easy
-```
-给定一个数组 prices ，它的第 i 个元素 prices[i] 表示一支给定股票第 i 天的价格。
-
-你只能选择 某一天 买入这只股票，并选择在 未来的某一个不同的日子 卖出该股票。设计一个算法来计算你所能获取的最大利润。
-
-返回你可以从这笔交易中获取的最大利润。如果你不能获取任何利润，返回 0 。
-```
-思路：只需要遍历价格数组一遍，记录历史最低点，然后在每一天考虑这么一个问题：如果我是在历史最低点买进的，那么我今天卖出能赚多少钱？当考虑完所有天数之时，我们就得到了最好的答案
-```java
-class Solution {
-  public int maxProfit(int[] prices) {
-    int minPrice = prices[0];
-    int maxProfit = 0;
-    for (int price: prices) {
-      if (price < minPrice) minPrice = price;
-      maxProfit = Math.max(maxProfit, price - minPrice);
-    }
-    return maxProfit;
-  }
-}
-```
 
 # 矩阵
 ## 54 螺旋矩阵 middle
@@ -685,7 +701,24 @@ class Solution {
 每行的第一个整数大于前一行的最后一个整数。
 给你一个整数 target ，如果 target 在矩阵中，返回 true ；否则，返回 false 。
 ```
-思路：根据定义可知若展开成一维数组后是一个排序好的数组，直接二分查找即可。或直接对每个int[]进行Arrays.binarySearch查找
+思路：
+* 若将矩阵每一行拼接在上一行的末尾，则会得到一个升序数组，我们可以在该数组上二分找到目标元素。此升序数组的下标，可以直接映射到原矩阵的行和列上
+```java
+class Solution {
+    public boolean searchMatrix(int[][] matrix, int target) {
+        int m = matrix.length, n = matrix[0].length, l = 0, r = m * n - 1, mid, value;
+        while (l <= r) {
+            mid = l + (r - l) / 2;
+            value = matrix[mid / n][mid % n];
+            if (value == target) return true;
+            if (value < target) l = mid + 1;
+            else r = mid - 1;
+        }
+        return false;
+    }
+}
+```
+* 根据定义可知若展开成一维数组后是一个排序好的数组，直接二分查找即可。但需要用额外的空间
 ```java
 class Solution {
     public boolean searchMatrix(int[][] matrix, int target) {
@@ -706,6 +739,7 @@ class Solution {
     }
 }
 ```
+* 多次二分查找，即对每个int[]进行Arrays.binarySearch查找
 ## 240 搜索二维矩阵2 middle
 ```
 编写一个高效的算法来搜索 m x n 矩阵 matrix 中的一个目标值 target 。该矩阵具有以下特性：
@@ -727,11 +761,11 @@ class Solution {
 class Solution {
     public boolean searchMatrix(int[][] matrix, int target) {
         int row = matrix.length - 1;
-        int line = 0;
-        while (row >= 0 && line < matrix[0].length) {
-            if (matrix[row][line] == target) return true;
-            else if (matrix[row][line] > target) row--; // 得减下，向上检索                
-            else line++;
+        int col = 0;
+        while (row >= 0 && col < matrix[0].length) {
+            if (matrix[row][col] == target) return true;
+            else if (matrix[row][col] > target) row--; // 得减下，向上检索                
+            else col++;
         }
         return false;
     }
@@ -744,17 +778,27 @@ class Solution {
 ```java
 class Solution {
     public ListNode deleteNode(ListNode head, int val) {
-        //虚拟头节点
-        ListNode dummyHead = new ListNode(-1), cur = dummyHead, tmp;
+        ListNode dummyHead = new ListNode(-1), cur = dummyHead;
         dummyHead.next = head;
-        while (cur != null) {
-            tmp = cur.next;
-            if (tmp != null && tmp.val == val) {
-                cur.next = tmp.next;
-            }
+        while (cur != null && cur.next != null) {
+            if (cur.next.val == val) cur.next = cur.next.next;
             cur = cur.next;
         }
         return dummyHead.next;
+    }
+}
+```
+## 237 删除链表中的节点 middle
+思路：先把要删的节点的值置为下一个节点的，然后next指向下下一个节点
+```java
+class Solution {
+    public void deleteNode(ListNode node) {
+        if (node.next == null) {
+            node = null;
+            return;
+        }
+        node.val = node.next.val;
+        node.next = node.next.next;
     }
 }
 ```
@@ -886,7 +930,25 @@ public class Solution {
 }
 ```
 ## 234 回文链表 easy
-思路：用栈的方式获取倒序查链表的能力，然后迭代出栈按序与链表进行比较。还可使用递归，比较复杂
+思路：
+* 用ArrayList方式获取按索引查链表的能力，再用双指针进行判断
+```java
+class Solution {
+    public boolean isPalindrome(ListNode head) {
+        List<ListNode> list = new ArrayList<>();
+        ListNode cur = head;
+        while (cur != null) {
+            list.add(cur);
+            cur = cur.next;
+        }
+        for (int l = 0, r = list.size() - 1; l < r; l++, r--) {
+            if (list.get(l).val != list.get(r).val) return false; 
+        }
+        return true;
+    }
+}
+```
+* 用栈的方式获取倒序查链表的能力，然后迭代出栈按序与链表进行比较。还可使用递归，比较复杂
 ```java
 class Solution {
     public boolean isPalindrome(ListNode head) {
@@ -908,9 +970,9 @@ class Solution {
 ```java
 class Solution {
     public ListNode reverseList(ListNode head) {
-        ListNode cur = head, pre = null;
+        ListNode cur = head, pre = null, tmp;
         while (cur != null) {
-            ListNode tmp = cur.next;
+            tmp = cur.next;
             cur.next = pre;
             pre = cur;
             cur = tmp;
@@ -919,8 +981,15 @@ class Solution {
     }
 }
 ```
-## 143 重排链表 middle 
-使用线性表支持下标的特性，但这个的空间复杂度是O(N)，还可使用寻找链表中点 + 链表逆序 + 合并链表的方式，空间复杂度O(1)
+## 143 重排链表 middle
+```
+给定一个单链表 L 的头节点 head ，单链表 L 表示为：
+L0 → L1 → … → Ln - 1 → Ln
+请将其重新排列后变为：
+L0 → Ln → L1 → Ln - 1 → L2 → Ln - 2 → …
+不能只是单纯的改变节点内部的值，而是需要实际的进行节点交换。
+```
+思路：使用线性表list支持下标的特性，但这个的空间复杂度是O(N)，还可使用寻找链表中点 + 链表逆序 + 合并链表的方式，空间复杂度O(1)
 ```java
 class Solution {
     public void reorderList(ListNode head) {
@@ -1002,8 +1071,22 @@ class Solution {
 ```
 ## 24 两两交换链表中的节点 middle
 思路：
-- 迭代：使用虚拟头节点指向head，cur作为虚拟头节点，cur下个节点指向second，second下个节点指向first，first下个节点指向third（tmp），然后置cur为first即此时的第二个字节
-- 递归：用 head 表示原始链表的头节点，新的链表的第二个节点，用 newHead 表示新的链表的头节点，原始链表的第二个节点，则原始链表中的其余节点的头节点是 newHead.next。令 head.next = swapPairs(newHead.next)，表示将其余节点进行两两交换，交换后的新的头节点为 head 的下一个节点。然后令 newHead.next = head，即完成了所有节点的交换。最后返回新的链表的头节点 newHead
+* 递归：推荐，更好理解且不容易出错
+- 用 head 表示原始链表的头节点，新的链表的第二个节点，用 newHead 表示新的链表的头节点，原始链表的第二个节点。令 head.next = swapPairs(newHead.next)，表示将其余节点进行两两交换，交换后的新的头节点为 head 的下一个节点。然后令 newHead.next = head，即完成了所有节点的交换。最后返回新的链表的头节点 newHead
+- 终止条件：当前节点或下一节点为空直接return，无法交换
+- 单层递归：原头节点的下一个节点即新的头节点，原头节点指向交换后的新旧头节点节点外的其余节点，然后新的头节点指向原头节点
+```java
+class Solution {
+    public ListNode swapPairs(ListNode head) {
+        if (head == null || head.next == null) return head;
+        ListNode newHead = head.next;
+        head.next = swapPairs(newHead.next);
+        newHead.next = head;
+        return newHead;
+    }
+}
+```
+* 迭代：使用虚拟头节点指向head，cur作为虚拟头节点，cur下个节点指向second，second下个节点指向first，first下个节点指向third（tmp），然后置cur为first即此时的第二个字节
 ```java
 //迭代
 class Solution {
@@ -1021,18 +1104,6 @@ class Solution {
             cur = first;
         }
         return dummyHead.next;
-    }
-}
-//递归
-class Solution {
-    public ListNode swapPairs(ListNode head) {
-        if (head == null || head.next == null) {
-            return head;
-        }
-        ListNode newHead = head.next;
-        head.next = swapPairs(newHead.next);
-        newHead.next = head;
-        return newHead;
     }
 }
 ```
@@ -1215,10 +1286,12 @@ class Solution {
 ## 2 两数相加 middle
 ```
 给你两个 非空 的链表，表示两个非负的整数。它们每位数字都是按照 逆序 的方式存储的，并且每个节点只能存储 一位 数字。
-
 请你将两个数相加，并以相同形式返回一个表示和的链表。
-
 你可以假设除了数字 0 之外，这两个数都不会以 0 开头。
+
+输入：l1 = [2,4,3], l2 = [5,6,4]
+输出：[7,0,8]
+解释：342 + 465 = 807.
 ```
 思路：同时遍历两个链表，逐位计算它们的和，并与当前位置的进位值相加即sum = n1 + n2 + carry，当前节点的值是sum % 10，新的进位是sum / 10。如果链表遍历结束后，有 carry>0，还需要在答案链表的后面附加一个节点，节点的值为 carry
 ```java
@@ -3086,7 +3159,7 @@ class Solution {
 ```
 给你一个字符串 s，请你将 s 分割成一些子串，使每个子串都是回文串。返回 s 所有可能的分割方案。
 ```
-思路：startIndex即本次递归的切割线，0代表第0个元素后切割，由于i代表着切割线不断后移，因此此时切割的子串是s.substring(startIndex, i + 1)。使用双指针判断回文
+思路：startIndex即本次递归的切割线，决定宽度。0代表第0个元素后切割，由于i代表着切割线不断后移，因此此时切割的子串是s.substring(startIndex, i + 1)，即[startIndex, i]。使用双指针判断回文
 ```java
 class Solution {
     List<List<String>> result = new ArrayList<>();
@@ -3119,13 +3192,79 @@ class Solution {
     }
 }
 ```
+## 93 复原IP地址 middle
+```
+有效 IP 地址 正好由四个整数（每个整数位于 0 到 255 之间组成，且不能含有前导 0），整数之间用 '.' 分隔。
+
+例如："0.1.2.201" 和 "192.168.1.1" 是 有效 IP 地址，但是 "0.011.255.245"、"192.168.1.312" 和 "192.168@1.1" 是 无效 IP 地址。
+给定一个只包含数字的字符串 s ，用以表示一个 IP 地址，返回所有可能的有效 IP 地址，这些地址可以通过在 s 中插入 '.' 来形成。你 不能 重新排序或删除 s 中的任何数字。你可以按 任何 顺序返回答案。
+```
+思路：number表示切割的段数，也是回溯递归的深度。startIndex是每一轮递归开始时的切割起始点，i向右切割，切割出某一段的区间是[startIndex, i]，ip分段的长度是i - startIndex + 1。判断有序ip的条件是：ip分段等于4且此时切割起始点已经指向字串长度，结合剪枝(ip段的长度最大是3，并且ip段处于[0,255])
+```
+class Solution {
+    List<String> result = new ArrayList<String>();
+
+    public List<String> restoreIpAddresses(String s) {
+        backtracking(s, 0, 0, "");
+        return result;
+    }
+
+    // number表示ip段的数量
+    public void backtracking(String s, int startIndex, int number, String str) {
+        // 如果startIndex等于s的长度并且ip段的数量是4，则加入结果集，并返回
+        if (startIndex == s.length() && number == 4) {
+            result.add(str.toString());
+            return;
+        }
+        // 如果startIndex等于s的长度但是ip段的数量不为4，或者ip段的数量为4但是startIndex小于s的长度，则直接返回
+        if (startIndex == s.length() || number == 4) {
+            return;
+        }
+        // 剪枝：ip段的长度最大是3，并且ip段处于[0,255]
+        for (int i = startIndex; 
+                i < s.length() && i - startIndex + 1 <= 3
+                && Integer.parseInt(s.substring(startIndex, i + 1)) >= 0
+                && Integer.parseInt(s.substring(startIndex, i + 1)) <= 255; 
+                i++) {
+            // 如果ip段的长度大于1，并且第一位为0的话，continue
+            if (i - startIndex + 1 > 1 && s.charAt(startIndex) - '0' == 0) {
+                continue;
+            }
+            // 当此时网段数量小于3时，才会加点；如果等于3，说明已经有3段了，最后一段不需要再加点
+            String ipPart = number < 3 ? s.substring(startIndex, i + 1) + "." : s.substring(startIndex, i + 1);
+            backtracking(s, i + 1, number + 1, str + ipPart);
+        }
+    }
+}
+```
 ## 78 子集 middle
 ```
 给你一个整数数组 nums ，数组中的元素 互不相同 。返回该数组所有可能的子集（幂集）。
 
 解集 不能 包含重复的子集。你可以按 任意顺序 返回解集。
 ```
-思路：基于77组合的解法，子集相当于从数组中找出0、1、2...length个组合
+思路：
+- 基于77组合的解法，调整终止条件即可，每次递归都是一个合理的子集。由于递归指定了深度最多是nums.length+1，所以不需要指定终止条件。此法效率最高
+```java
+class Solution {
+    List<List<Integer>> result = new ArrayList<>();
+    LinkedList<Integer> path = new LinkedList<>();
+    public List<List<Integer>> subsets(int[] nums) {
+        backtracking(nums, 0);
+        return result;
+    }
+    private void backtracking(int[] nums, int startIndex) {
+        result.add(new ArrayList<>(path));
+        for (int i = startIndex; i < nums.length; i++) {
+            path.add(nums[i]);
+            backtracking(nums, i + 1);
+            path.removeLast();
+        }
+
+    }
+}
+```
+- 基于77组合的解法，子集相当于从数组中找出0、1、2...length个组合，时间复杂度高
 ```java
 class Solution {
     List<List<Integer>> result = new ArrayList<>();
@@ -3145,6 +3284,78 @@ class Solution {
             path.add(nums[i]);
             backtracking(nums, k, i + 1);
             path.removeLast();
+        }
+    }
+}
+```
+## 90 子集2 middle
+```
+给你一个整数数组 nums ，其中可能包含重复元素，请你返回该数组所有可能的子集（幂集）。
+
+解集 不能 包含重复的子集。返回的解集中，子集可以按 任意顺序 排列。
+
+输入：nums = [1,2,2]
+输出：[[],[1],[1,2],[1,2,2],[2],[2,2]]
+```
+思路：在78的基础上做树层去重，有两种方法
+- 不使用used数组，递归的时候下一个startIndex是i+1而不是0。但如果要是全排列的话，每次要从0开始遍历，为了跳过已入栈的元素，此时必须使用used
+```java
+class Solution {
+    List<List<Integer>> res = new ArrayList<>();
+    LinkedList<Integer> path = new LinkedList<>();
+
+    public List<List<Integer>> subsetsWithDup(int[] nums) {
+        Arrays.sort(nums);
+        subsetsWithDupHelper(nums, 0);
+        return res;
+    }
+
+    private void subsetsWithDupHelper(int[] nums, int start) {
+        res.add(new ArrayList<>(path));
+        for (int i = start; i < nums.length; i++) {
+            // 跳过当前树层使用过的、相同的元素
+            if (i > start && nums[i - 1] == nums[i]) {
+                continue;
+            }
+            path.add(nums[i]);
+            subsetsWithDupHelper(nums, i + 1);
+            path.removeLast();
+        }
+    }
+
+}
+```
+- 使用used数组
+```java
+class Solution {
+   List<List<Integer>> result = new ArrayList<>();// 存放符合条件结果的集合
+   LinkedList<Integer> path = new LinkedList<>();// 用来存放符合条件结果
+   boolean[] used;
+    public List<List<Integer>> subsetsWithDup(int[] nums) {
+        if (nums.length == 0){
+            result.add(path);
+            return result;
+        }
+        Arrays.sort(nums);
+        used = new boolean[nums.length];
+        subsetsWithDupHelper(nums, 0);
+        return result;
+    }
+    
+    private void subsetsWithDupHelper(int[] nums, int startIndex){
+        result.add(new ArrayList<>(path));
+        if (startIndex >= nums.length){
+            return;
+        }
+        for (int i = startIndex; i < nums.length; i++){
+            if (i > 0 && nums[i] == nums[i - 1] && !used[i - 1]){
+                continue;
+            }
+            path.add(nums[i]);
+            used[i] = true;
+            subsetsWithDupHelper(nums, i + 1);
+            path.removeLast();
+            used[i] = false;
         }
     }
 }
@@ -3449,6 +3660,28 @@ class Solution {
     if (n <= 2) return n;
     return climbStairs(n - 1) + climbStairs(n - 2);
   }
+}
+```
+## 121 买卖股票的最佳时机 easy
+```
+给定一个数组 prices ，它的第 i 个元素 prices[i] 表示一支给定股票第 i 天的价格。
+
+你只能选择 某一天 买入这只股票，并选择在 未来的某一个不同的日子 卖出该股票。设计一个算法来计算你所能获取的最大利润。
+
+返回你可以从这笔交易中获取的最大利润。如果你不能获取任何利润，返回 0 。
+```
+思路：只需要遍历价格数组一遍，记录历史最低点，然后在每一天考虑这么一个问题：如果我是在历史最低点买进的，那么我今天卖出能赚多少钱？当考虑完所有天数之时，我们就得到了最好的答案
+```java
+class Solution {
+    public int maxProfit(int[] prices) {
+        int minPrice = prices[0];
+        int maxProfit = 0;
+        for (int price: prices) {
+            minPrice = Math.min(minPrice, price);
+            maxProfit = Math.max(maxProfit, price - minPrice);
+        }
+        return maxProfit;
+    }
 }
 ```
 ## 300 最长递增子序列 middle

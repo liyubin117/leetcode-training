@@ -300,6 +300,7 @@ m大于等于3，小于等于14，即在蔡勒公式中，某年的1,2月份要�
 * Integer.toBinaryString()
 * Integer.bitCount() 二进制1的数量
 * Integer.reverse() 颠倒二进制数
+* int Integer.parseInt(String) 将直接返回int型，比Integer.valueOf()性能高
 * Collections.reverse(List) 颠倒List的顺序
 * Collections.sort(List, Comparator) 可使用自定义比较函数进行排序
 * Character.isLetterOrDigit() 字符是否是数字或字母
