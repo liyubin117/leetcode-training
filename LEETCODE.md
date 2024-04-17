@@ -2245,18 +2245,19 @@ class Solution {
 ## 101 对称二叉树 easy
 只能使用后序遍历，需要先收集孩子的信息再向上一层返回。若外侧、内侧都对应相同则是对称的
 ```java
-public boolean isSymmetric(TreeNode root) {
+class Solution {
+  public boolean isSymmetric(TreeNode root) {
     return recurse(root.left, root.right);
-}
-private boolean recurse(TreeNode left, TreeNode right) {
-    if (left == null && right != null) return false;
-    if (left != null && right == null) return false;
+  }
+  private boolean recurse(TreeNode left, TreeNode right) {
     if (left == null && right == null) return true;
+    if (left == null || right == null) return false;
     if (left.val != right.val) return false;
     boolean outer = recurse(left.left, right.right);
     boolean inner = recurse(left.right, right.left);
     if (outer && inner) return true;
     else return false;
+  }
 }
 ```
 ## 104 二叉树的最大深度 easy
@@ -2573,23 +2574,27 @@ class Solution {
 ## 617 合并二叉树 easy
 前序遍历
 ```java
-public TreeNode mergeTrees(TreeNode root1, TreeNode root2) {
-    if (root1 == null) return root2;
-    if (root2 == null) return root1;
-    root1.val += root2.val;
-    root1.left = mergeTrees(root1.left, root2.left);
-    root1.right = mergeTrees(root1.right, root2.right);
-    return root1;
+class Solution {
+    public TreeNode mergeTrees(TreeNode root1, TreeNode root2) {
+        if (root1 == null) return root2;
+        if (root2 == null) return root1;
+        root1.val += root2.val;
+        root1.left = mergeTrees(root1.left, root2.left);
+        root1.right = mergeTrees(root1.right, root2.right);
+        return root1;
+    }
 }
 ```
 ## 700 二叉搜索树中的搜索 easy
 ```java
-public TreeNode searchBST(TreeNode root, int val) {
+class Solution {
+  public TreeNode searchBST(TreeNode root, int val) {
     if (root == null || root.val == val) return root;
     TreeNode result = null;
     if (root.left != null && root.val > val) result = searchBST(root.left, val);
     if (root.right != null && root.val < val) result = searchBST(root.right, val);
     return result;
+  }
 }
 ```
 ## 98 验证二叉搜索树 middle
@@ -2924,35 +2929,6 @@ class Solution {
 ```
 
 # 回溯
-## 46 全排列 middle
-```
-给定一个不含重复数字的数组 nums ，返回其 所有可能的全排列 。你可以 按任意顺序 返回答案。
-```
-思路：回溯
-- 终止条件：path元素数量满足要求即收集结果
-- 单层递归：遍历数组，若path已添加该元素则跳过，未添加则加入后进行递归再回溯
-```java
-class Solution {
-    List<List<Integer>> result = new ArrayList<>();
-    LinkedList<Integer> path = new LinkedList<>();
-    public List<List<Integer>> permute(int[] nums) {
-        backtracking(nums);
-        return result;
-    }
-    private void backtracking(int[] nums) {
-        if (path.size() == nums.length) {
-            result.add(new ArrayList<>(path));
-            return;
-        }
-        for (int num: nums) {
-            if (path.contains(num)) continue;
-            path.add(num);
-            backtracking(nums);
-            path.removeLast();
-        }
-    }
-}
-```
 ## 77 组合 middle
 ```
 给定两个整数 n 和 k，返回范围 [1, n] 中所有可能的 k 个数的组合。
@@ -3200,7 +3176,7 @@ class Solution {
 给定一个只包含数字的字符串 s ，用以表示一个 IP 地址，返回所有可能的有效 IP 地址，这些地址可以通过在 s 中插入 '.' 来形成。你 不能 重新排序或删除 s 中的任何数字。你可以按 任何 顺序返回答案。
 ```
 思路：number表示切割的段数，也是回溯递归的深度。startIndex是每一轮递归开始时的切割起始点，i向右切割，切割出某一段的区间是[startIndex, i]，ip分段的长度是i - startIndex + 1。判断有序ip的条件是：ip分段等于4且此时切割起始点已经指向字串长度，结合剪枝(ip段的长度最大是3，并且ip段处于[0,255])
-```
+```java
 class Solution {
     List<String> result = new ArrayList<String>();
 
@@ -3325,6 +3301,39 @@ class Solution {
 
 }
 ```
+- 使用HashSet记录树层元素
+```java
+class Solution {
+   List<List<Integer>> result = new ArrayList<>();// 存放符合条件结果的集合
+   LinkedList<Integer> path = new LinkedList<>();// 用来存放符合条件结果
+    public List<List<Integer>> subsetsWithDup(int[] nums) {
+        if (nums.length == 0){
+            result.add(path);
+            return result;
+        }
+        Arrays.sort(nums);
+        subsetsWithDupHelper(nums, 0);
+        return result;
+    }
+    
+    private void subsetsWithDupHelper(int[] nums, int startIndex){
+        result.add(new ArrayList<>(path));
+        if (startIndex >= nums.length){
+            return;
+        }
+        Set<Integer> hashSet = new HashSet<>();
+        for (int i = startIndex; i < nums.length; i++){
+            if (hashSet.contains(nums[i])){
+                continue;
+            }
+            path.add(nums[i]);
+            hashSet.add(nums[i]);
+            subsetsWithDupHelper(nums, i + 1);
+            path.removeLast();
+        }
+    }
+}
+```
 - 使用used数组
 ```java
 class Solution {
@@ -3348,6 +3357,9 @@ class Solution {
             return;
         }
         for (int i = startIndex; i < nums.length; i++){
+            // used[i - 1] == true，说明同一树枝candidates[i - 1]使用过
+            // used[i - 1] == false，说明同一树层candidates[i - 1]使用过
+            // 而我们要对同一树层使用过的元素进行跳过
             if (i > 0 && nums[i] == nums[i - 1] && !used[i - 1]){
                 continue;
             }
@@ -3360,12 +3372,139 @@ class Solution {
     }
 }
 ```
+## 491 非递减子序列 middle
+```
+给你一个整数数组 nums ，找出并返回所有该数组中不同的递增子序列，递增子序列中 至少有两个元素 。你可以按 任意顺序 返回答案。
+数组中可能含有重复元素，如出现两个整数相等，也可以视作递增序列的一种特殊情况。
+```
+思路：回溯。进行树层去重，由于是子序列，不能排序后通过i > startIndex来去重，因此不能用used数组，而是通过HashSet记录树层遍历的内容。树枝可以重复，树枝递归时要剪枝比前一个元素小的
+```
+class Solution {
+    List<List<Integer>> result = new ArrayList<>();
+    Deque<Integer> path = new LinkedList<>();
+    public List<List<Integer>> findSubsequences(int[] nums) {
+        backTracking(nums, 0);
+        return result;
+    }
+    private void backTracking(int[] nums, int startIndex){
+        if(path.size() >= 2) result.add(new ArrayList<>(path));
+        HashSet<Integer> hs = new HashSet<>();
+        for(int i = startIndex; i < nums.length; i++){
+            if(!path.isEmpty() && path.getLast() > nums[i] || hs.contains(nums[i])) //前两个判断是树枝剪枝，后一个判断是树层去重
+                continue;
+            hs.add(nums[i]);
+            path.add(nums[i]);
+            backTracking(nums, i + 1);
+            path.removeLast();
+        }
+    }
+}
+```
+## 46 全排列 middle
+```
+给定一个不含重复数字的数组 nums ，返回其 所有可能的全排列 。你可以 按任意顺序 返回答案。
+
+输入：nums = [1,2,3]
+输出：[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+```
+思路：回溯
+- 终止条件：path元素数量满足要求即收集结果
+- 单层递归：遍历数组，若path已添加该元素则跳过，未添加则加入后进行递归再回溯
+```java
+class Solution {
+    List<List<Integer>> result = new ArrayList<>();
+    Deque<Integer> path = new LinkedList<>();
+    public List<List<Integer>> permute(int[] nums) {
+        backtracking(nums);
+        return result;
+    }
+    private void backtracking(int[] nums) {
+        if (path.size() == nums.length) {
+            result.add(new ArrayList<>(path));
+            return;
+        }
+        for (int num: nums) {
+            if (path.contains(num)) continue;
+            path.add(num);
+            backtracking(nums);
+            path.removeLast();
+        }
+    }
+}
+```
+## 47 全排列2 middle
+```
+给定一个可包含重复数字的序列 nums ，按任意顺序 返回所有不重复的全排列。
+
+输入：nums = [1,1,2]
+输出：
+[[1,1,2],
+ [1,2,1],
+ [2,1,1]]
+```
+思路：回溯。排序后使用used数组区分某节点在同一树层或树支是否使用过
+```java
+class Solution {
+    List<List<Integer>> result = new ArrayList<>();
+    LinkedList<Integer> path = new LinkedList<>();
+    boolean[] used;
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        used = new boolean[nums.length];
+        Arrays.sort(nums);
+        backtracking(nums);
+        return result;
+    }
+
+    private void backtracking(int[] nums) {
+        if (path.size() == nums.length) {
+            result.add(new ArrayList<>(path));
+            return;
+        }
+        for (int i = 0; i < nums.length; i++) {
+            // used[i - 1] == false，说明nums[i - 1]在树层上，要做去重
+            if (i > 0 && nums[i] == nums[i - 1] && used[i - 1] == false) {
+                continue;
+            }
+            //如果同⼀树⽀nums[i]还未在树枝上，则进行树枝的递归
+            if (used[i] == false) {
+                used[i] = true;//标记nums[i]此时在树枝上，防止同一树枝重复使用
+                path.add(nums[i]);
+                backtracking(nums);
+                path.removeLast();//回溯，说明同⼀树层nums[i]使⽤过，防止下一树层重复  
+                used[i] = false;//回溯
+            }
+        }
+    }
+}
+```
 ## 22 括号生成 middle
 ```
 数字 n 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 有效的 括号组合。
 ```
-思路：暴力递归，长度为 n 的序列就是在长度为 n−1 的序列前加一个(或)。 为了检查序列是否有效，我们遍历这个序列，并使用一个变量 balance 表示左括号的数量减去右括号的数量。如果在遍历过程中 balance 的值小于零，或者结束时 balance 的值不为零，那么该序列就是无效的，否则它是有效的。
+思路：
+* 回溯，left、right分别代表左右括号的数量，一开始都是0
+- 终止条件：左括号数量小于右括号或大于n直接剪枝，左右括号数量都等于n时收集结果
+- 单层递归：左括号数量小于n时说明还要补充(，右括号数量小于左括号时说明还要补充)
+```java
+class Solution {
+    private List<String> result = new ArrayList<>();
+    public List<String> generateParenthesis(int n) {
+        backtracking(n, 0, 0, "");
+        return result;
+    }
+    private void backtracking(int n, int l, int r, String str) {
+        if (l > n || l < r) return;
+        if (l == n && r == n) {
+            result.add(str);
+            return;
+        }
+        if (l < n) backtracking(n, l + 1, r, str + "(");
+        if (r < l) backtracking(n, l, r + 1, str + ")"); 
+    }
+}
 ```
+* 暴力递归，长度为 n 的序列就是在长度为 n−1 的序列前加一个(或)。 为了检查序列是否有效，我们遍历这个序列，并使用一个变量 balance 表示左括号的数量减去右括号的数量。如果在遍历过程中 balance 的值小于零，或者结束时 balance 的值不为零，那么该序列就是无效的，否则它是有效的。
+```java
 class Solution {
     List<String> result = new ArrayList<String>();
     public List<String> generateParenthesis(int n) {
@@ -3399,27 +3538,6 @@ class Solution {
             }
         }
         return balance == 0;
-    }
-}
-```
-思路：回溯，left、right分别代表左右括号的数量，一开始都是0
-- 终止条件：左括号数量小于右括号或大于n直接剪枝，左右括号数量都等于n时收集结果
-- 单层递归：左括号数量小于n时说明还要补充(，右括号数量小于左括号时说明还要补充)
-```java
-class Solution {
-    private List<String> result = new ArrayList<>();
-    public List<String> generateParenthesis(int n) {
-        backtracking(n, 0, 0, "");
-        return result;
-    }
-    private void backtracking(int n, int l, int r, String str) {
-        if (l > n || l < r) return;
-        if (l == n && r == n) {
-            result.add(str);
-            return;
-        }
-        if (l < n) backtracking(n, l + 1, r, str + "(");
-        if (r < l) backtracking(n, l, r + 1, str + ")"); 
     }
 }
 ```
