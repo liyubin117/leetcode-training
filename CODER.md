@@ -107,7 +107,7 @@ return fib(n - 1) + fib(n - 2);
 # 回溯法
 一种特殊的递归, 是一个决策树的遍历过程，递归之前做出选择，递归之后撤销选择
 
-本质仍是暴力法，但能解决很多无法用预先规定好的的for循环来处理的问题
+本质仍是暴力法，但能解决很多无法预先规定好具体有多少个for循环来处理的问题
 
 可以抽象成一个N叉树
 - 宽度，集合的大小，for循环来处理
@@ -324,6 +324,7 @@ m大于等于3，小于等于14，即在蔡勒公式中，某年的1,2月份要�
 * Character.isLetter() 是否是字母
 * char String.charAt() 某索引位置的字符
 * String.join(delimiter, elements) 使用指定分隔符拼接e
+* String.copyValueOf(char[]) 将char数组转换为String
 * String实例方法 char[] toCharArray() 转换成char数组
 * String实例方法 char charAt(int) 获取某索引处的字符
 * StringBuffer

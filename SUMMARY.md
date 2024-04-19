@@ -25,6 +25,7 @@
 * [day27](DAY27.md)
 * [day28](DAY28.md)
 * [day29](DAY29.md)
+* [day30](DAY30.md)
 * [coder](CODER.md)
 * [leetcode](LEETCODE.md)
 * [nowcoder](NOWCODER.md)
