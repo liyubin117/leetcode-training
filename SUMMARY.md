@@ -26,6 +26,8 @@
 * [day28](DAY28.md)
 * [day29](DAY29.md)
 * [day30](DAY30.md)
+* [day31](DAY31.md)
 * [coder](CODER.md)
 * [leetcode](LEETCODE.md)
+* [贪心法](leetcode/贪心法.md)
 * [nowcoder](NOWCODER.md)
