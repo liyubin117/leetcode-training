@@ -36,6 +36,7 @@
 * [day38](DAY38.md)
 * [day39](DAY39.md)
 * [day41](DAY41.md)
+* [day42](DAY42.md)
 * [leetcode](LEETCODE.md)
   * [数组](leetcode/数组.md)
   * [链表](leetcode/链表.md)
