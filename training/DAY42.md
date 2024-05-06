@@ -92,11 +92,9 @@ public class Main{
         }
         
         int[] bag=new int[N+1];
-        for(int i=1;i<=M;i++){
-            for(int j=N;j>=1;j--){
-                if(weight[i]<=j){
-                    bag[j]=Math.max(bag[j-weight[i]]+value[i],bag[j]);
-                }
+        for(int i=0;i<=M;i++){
+            for(int j=N;j>=weight[i];j--){
+                bag[j]=Math.max(bag[j-weight[i]]+value[i],bag[j]);
             }
         }
 
@@ -113,7 +111,7 @@ public class Main{
 输出：true
 解释：数组可以分割成 [1, 5, 5] 和 [11] 。
 ```
-思路：求和后除2，找出哪些元素相加等于这个值，自然剩下的也是这个值。回溯会超时。用动态规划，转化成01背包问题，每个元素都是一种物品，数值既是重量也是价值，若价值等于重量等于目标则说明已装满这个背包：target=sum/2，dp[target]==target即装满
+思路：求和后除2，找出哪些元素相加等于这个值，自然剩下的也是这个值。回溯会超时。用动态规划，转化成01背包问题，每个元素都是一种物品，数值既是重量也是价值，dp[j]表示容量j的背包的最大价值，若价值等于重量等于目标则说明已装满这个背包：target=sum/2，dp[target]==target即装满
 ```java
 class Solution {
     public boolean canPartition(int[] nums) {
@@ -124,14 +122,12 @@ class Solution {
         if(sum % 2 != 0) return false;
         int target = sum / 2;
         int[] dp = new int[target + 1];
-        for(int i = 1; i < nums.length; i++) {
-            for (int j = target; j >= 1; j--) {
-                if (nums[i] <= j) {
-                    dp[j] = Math.max(dp[j], dp[j - nums[i]] + nums[i]);
-                }
+        for(int i = 0; i < nums.length; i++) {
+            for (int j = target; j >= nums[i]; j--) {
+                dp[j] = Math.max(dp[j], dp[j - nums[i]] + nums[i]);
             }
         }
-        return dp[target] == target ? true : false;
+        return dp[target] == target;
     }
 }
 ```
