@@ -240,7 +240,7 @@ for 状态1 in 状态1的所有取值：
 使用一维解法
 - 遍历顺序：正序遍历背包。
   - 组合：先遍历物品还是背包都可以，前者的左上、正上已知，后者的正左、左下已知，都可推出来，为保持一致还是先遍历物品
-  - 排列：只能是先遍历背包再遍历物品
+  - 排列：只能是先遍历背包再遍历物品，注意必须在最里层循环内（注意不在for内加）加if判断，只在需要调用递推公式时执行，不然同一个j的不同i情况会互相影响
 
 # 分治法
 一种特殊的递归, 分解问题到不可分解的原子问题, 然后分别求解后往上汇总. 有时也需要计算跨域结果, 比如53
@@ -365,6 +365,7 @@ m大于等于3，小于等于14，即在蔡勒公式中，某年的1,2月份要�
 * Arrays.fill(int[], int) 给数组的每个位置赋值指定值
 * Arrays.equals(int[], int[]) 比较两个数组是否值一样
 * Arrays.asList(...) 将一些不定长入参转换成List
+* Arrays.copyOfRange(int[], start, end) 将int[]数组的[start,end)范围内的元素拷贝成一个新的int[]
 * T[] Arrays.copyOfRange(T[], from, to) 返回一个原数组从包含from到不包含to的数组
 * list.stream().mapToInt(Integer::intValue).toArray() 将一个List<Integer>转换成int[]
 * set.stream().mapToInt(Integer::intValue).toArray() 将一个Set<Integer>转换成int[]
