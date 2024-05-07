@@ -1,11 +1,13 @@
 # Table of contents
 
 * [coder](CODER.md)
-* [leetcode](LEETCODE.md)
+* leetcode
   * [数组](leetcode/数组.md)
   * [链表](leetcode/链表.md)
   * [矩阵](leetcode/矩阵.md)
   * [字符串](leetcode/字符串.md)
+  * [滑动窗口](leetcode/滑动窗口.md)
+  * [数学](leetcode/数学.md)
   * [哈希表](leetcode/哈希表.md)
   * [栈和队列](leetcode/栈和队列.md)
   * [二叉树](leetcode/二叉树.md)
