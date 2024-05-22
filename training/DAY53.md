@@ -73,7 +73,7 @@ class Solution {
 - 动态规划
     - dp数组定义：dp[i] 以i下标元素为结尾的最大子数组的和
     - 递推公式：求和，要么延续即dp[i-1]+nums[i]，要么不延续即nums[i]，较大值即dp[i]
-    - dp数组初始化：dp[0]=nums[0]
+    - dp数组初始化：dp[0]=nums0[]
 ```java
 class Solution {
     public int maxSubArray(int[] nums) {
