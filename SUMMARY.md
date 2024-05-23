@@ -65,3 +65,6 @@
   * [day54](training/DAY54.md)
   * [day55](training/DAY55.md)
   * [day56](training/DAY56.md)
+  * [day57](training/DAY57.md)
+  * [day59](training/DAY59.md)
+  * [day60](training/DAY60.md)
