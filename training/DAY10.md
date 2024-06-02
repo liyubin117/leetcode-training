@@ -70,10 +70,7 @@ int pop() 移除并返回栈顶元素。
 int top() 返回栈顶元素。
 boolean empty() 如果栈是空的，返回 true ；否则，返回 false 。
 ```
-https://programmercarl.com/0225.%E7%94%A8%E9%98%9F%E5%88%97%E5%AE%9E%E7%8E%B0%E6%A0%88.html
-
 思路：使用LinkedList作为队列，每次写后都把所有的元素重新出队再入队，其他操作直接调用队列的方法就行
-
 ```java
 class MyStack {
     Queue<Integer> queue;
@@ -81,7 +78,7 @@ class MyStack {
     public MyStack() {
         queue = new LinkedList<>();
     }
-
+    
     public void push(int x) {
         queue.offer(x);
         int size = queue.size();
@@ -89,15 +86,15 @@ class MyStack {
             queue.offer(queue.poll());
         }
     }
-
+    
     public int pop() {
         return queue.poll();
     }
-
+    
     public int top() {
         return queue.peek();
     }
-
+    
     public boolean empty() {
         return queue.isEmpty();
     }

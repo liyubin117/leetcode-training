@@ -111,7 +111,9 @@ return fib(n - 1) + fib(n - 2);
 
 可以抽象成一个N叉树
 - 宽度，集合的大小，for循环来处理
-- 深度，递归的深度，递归来处理
+- 深度，递归的深度，递归来处理。组合问题需要递归startIndex+1，排列问题不需要startIndex因为每次都是从第1个元素开始
+
+有时经常会用到树层去重、树枝不去重，需要定义boolean[] used数组，若为true说明此元素在同一树枝使用过，false说明在同一树层使用过
 
 常用于处理“所有可能”、“所有可能且有效”的问题
 - 组合问题，如从1,2,3,4找两个，所有的组合方式
@@ -129,7 +131,9 @@ return fib(n - 1) + fib(n - 2);
 
 ## 抽象过程
 - 确定递归函数参数和返回值
-- 确定终止条件
+- 确定终止条件，注意收集结果时必须拷贝结果对象，否则后续的变动会影响之前已收集的结果，
+  - 若结果是String str，则用str.toString()
+  - 若结果是List<> list，则用new ArrayList<>(list)
 - 确定单层递归逻辑：做出选择，递归后撤销选择
   - 也可以直接在回溯函数的入参中做出选择而不改变原值，这样会隐藏的撤销选择
   - 当输入包含重复元素且输出要求去重时，先对输入排序，然后做出选择前进行树层去重，而树枝可以重复。因为排序后同一树层若之前已经选择了相同的元素，那其必然已经包含了后续的情况
@@ -391,8 +395,10 @@ m大于等于3，小于等于14，即在蔡勒公式中，某年的1,2月份要�
 * int Integer.parseInt(String) 将直接返回int型，比Integer.valueOf()性能高
 * Collections.reverse(List) 颠倒List的顺序
 * Collections.sort(List, Comparator) 可使用自定义比较函数进行排序
-* Character.isLetterOrDigit() 字符是否是数字或字母
-* Character.isLetter() 是否是字母
+* Character
+  * static isLetterOrDigit() 字符是否是数字或字母
+  * static isLetter() 是否是字母
+  * static toLowerCase(ch) 转小写
 * char String.charAt() 某索引位置的字符
 * String.join(delimiter, elements) 使用指定分隔符拼接e
 * String.copyValueOf(char[]) 将char数组转换为String
@@ -403,7 +409,7 @@ m大于等于3，小于等于14，即在蔡勒公式中，某年的1,2月份要�
   - toString() 整体转换成字符串
 
 # 常用java类
-* 栈 Stack ArrayDeque
+* 栈 Stack ArrayDeque 后者支持removeLast即可两端操作
 * 双端队列 LinkedList
 * 优先级队列 PriorityQueue 默认是最小堆，自定义比较器是p1 - p2。最大堆的自定义比较器是p2 - p1
 * Map的键序：HashTable.keySet()-降序；TreeMap.keySet()-升序;HashMap.keySet()-乱序;LinkedHashMap.keySet() 原序
