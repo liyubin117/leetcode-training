@@ -15,6 +15,8 @@
   * [贪心法](leetcode/贪心法.md)
   * [动态规划](leetcode/动态规划.md)
 * [nowcoder](NOWCODER.md)
+* 算法
+  * [排序](algorithm/排序.md)
 * training
   * [day1](training/DAY1.md)
   * [day2](training/DAY2.md)

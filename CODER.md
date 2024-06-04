@@ -36,7 +36,7 @@ jdk提供了方法：Arrays.binarySearch(T[] arr, T)
 ```
 private static int search(int[] nums, int target) {
     int l = 0, r = nums.length - 1;
-    while (r >= l) {
+    while (l <= r) {
         int mid = l + (r - l) / 2;
         if (nums[mid] == target) return mid;
         if (nums[mid] < target) l = mid + 1;
