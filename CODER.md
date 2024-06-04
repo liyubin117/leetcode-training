@@ -376,23 +376,26 @@ m大于等于3，小于等于14，即在蔡勒公式中，某年的1,2月份要�
 
 # 常用方法
 * Comparator接口 (p1, p2) -> p1 - p2从小到大，(p1, p2) -> p2 - p1从大到小
-* Arrays.sort() 直接对原数组排序，无返回值，归并排序。从小到大排
-* Arrays.binarySearch() 二分查找
-* Arrays.fill(int[], int) 给数组的每个位置赋值指定值
-* Arrays.equals(int[], int[]) 比较两个数组是否值一样
-* Arrays.asList(...) 将一些不定长入参转换成List
-* Arrays.copyOfRange(int[], start, end) 将int[]数组的[start,end)范围内的元素拷贝成一个新的int[]
+* Arrays
+  * Arrays.sort() 直接对原数组排序，无返回值，归并排序。从小到大排
+  * Arrays.binarySearch() 二分查找
+  * Arrays.fill(int[], int) 给数组的每个位置赋值指定值
+  * Arrays.equals(int[], int[]) 比较两个数组是否值一样
+  * Arrays.asList(...) 将一些不定长入参转换成List
+  * Arrays.copyOfRange(int[], start, end) 将int[]数组的[start,end)范围内的元素拷贝成一个新的int[]
 * T[] Arrays.copyOfRange(T[], from, to) 返回一个原数组从包含from到不包含to的数组
-* list.stream().mapToInt(Integer::intValue).toArray() 将一个List<Integer>转换成int[]
+* List
+  * list.stream().mapToInt(Integer::intValue).toArray() 将一个List<Integer>转换成int[]
+  * list.size() 获取大小。如果是int[] arr数组，则是arr.length，如果是String str字符串，则是str.length()
+  * list.remove() 当传入参数是int型时认为是删除某索引的值，传入Object引用型时删除对应的对象
+    - list.remove(1) 删除1索引的值
+    - list.remove(Integer.valueOf(1)) 删除1对象
 * set.stream().mapToInt(Integer::intValue).toArray() 将一个Set<Integer>转换成int[]
-* list.size() 获取大小。如果是int[] arr数组，则是arr.length，如果是String str字符串，则是str.length()
-* list.remove() 当传入参数是int型时认为是删除某索引的值，传入Object引用型时删除对应的对象
-  - list.remove(1) 删除1索引的值
-  - list.remove(Integer.valueOf(1)) 删除1对象
-* Integer.toBinaryString()
-* Integer.bitCount() 二进制1的数量
-* Integer.reverse() 颠倒二进制数
-* int Integer.parseInt(String) 将直接返回int型，比Integer.valueOf()性能高
+* Integer
+  * Integer.toBinaryString()
+  * Integer.bitCount() 二进制1的数量
+  * Integer.reverse() 颠倒二进制数
+  * int Integer.parseInt(String) 将直接返回int型，比Integer.valueOf()性能高
 * Collections.reverse(List) 颠倒List的顺序
 * Collections.sort(List, Comparator) 可使用自定义比较函数进行排序
 * Character
@@ -400,10 +403,11 @@ m大于等于3，小于等于14，即在蔡勒公式中，某年的1,2月份要�
   * static isLetter() 是否是字母
   * static toLowerCase(ch) 转小写
 * char String.charAt() 某索引位置的字符
-* String.join(delimiter, elements) 使用指定分隔符拼接e
-* String.copyValueOf(char[]) 将char数组转换为String
-* String实例方法 char[] toCharArray() 转换成char数组
-* String实例方法 char charAt(int) 获取某索引处的字符
+* String
+  * String.join(delimiter, elements) 使用指定分隔符拼接e
+  * String.copyValueOf(char[]) 将char数组转换为String
+  * String实例方法 char[] toCharArray() 转换成char数组
+  * String实例方法 char charAt(int) 获取某索引处的字符
 * StringBuffer
   - append() 一步步构建字符串
   - toString() 整体转换成字符串
