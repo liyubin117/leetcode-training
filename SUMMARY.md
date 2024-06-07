@@ -71,3 +71,6 @@
   * [day59](training/DAY59.md)
   * [day60](training/DAY60.md)
   * [训练营总结篇](training/训练营总结篇.md)
+* secondTraining
+  * [day1](secondTraining/DAY1.md)
+  * [day2](secondTraining/DAY2.md)
