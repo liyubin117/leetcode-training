@@ -44,7 +44,7 @@ class Solution {
 ```
 
 ## 59 螺旋数组2 middle
-left right top bottom代表四边
+left right top bottom代表四边，从左到右增加，从上到下增加
 ```java
 class Solution {
     public int[][] generateMatrix(int n) {

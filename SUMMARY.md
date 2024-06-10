@@ -74,3 +74,5 @@
 * secondTraining
   * [day1](secondTraining/DAY1.md)
   * [day2](secondTraining/DAY2.md)
+  * [day3](secondTraining/DAY3.md)
+  * [day4](secondTraining/DAY4.md)

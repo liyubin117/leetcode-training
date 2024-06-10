@@ -12,7 +12,7 @@ https://programmercarl.com/0024.%E4%B8%A4%E4%B8%A4%E4%BA%A4%E6%8D%A2%E9%93%BE%E8
 
 复杂度：时间O(N) 空间O(1)
 ```java
-//第一种：虚拟头节点，迭代，比较容易想到，建议用这个
+//第一种：虚拟头节点，迭代
 class Solution {
     public ListNode swapPairs(ListNode head) {
         ListNode dumyhead = new ListNode(-1); // 设置一个虚拟头结点
