@@ -77,3 +77,4 @@
   * [day3](training2/DAY3.md)
   * [day4](training2/DAY4.md)
   * [day6](training2/DAY6.md)
+  * [day7](training2/DAY7.md)
