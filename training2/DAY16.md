@@ -1,8 +1,6 @@
-# day18
+# day16
 
-## 第十八天| 二叉树 513 112 113 105 106
-
-### 513 找树左下角的值
+## 513 找树左下角的值
 ```
 给定一个二叉树的 根节点 root，请找出该二叉树的 最底层 最左边 节点的值。
 
@@ -59,7 +57,7 @@ class Solution {
 }
 ```
 
-### 112 路径总和 easy
+## 112 路径总和 easy
 ```
 给你二叉树的根节点 root 和一个表示目标和的整数 targetSum 。判断该树中是否存在 根节点到叶子节点 的路径，这条路径上所有节点值相加等于目标和 targetSum 。如果存在，返回 true ；否则，返回 false 。
 ```
@@ -90,47 +88,7 @@ class Solution {
 }
 ```
 
-### 113 路径总和2 middle
-```
-给你二叉树的根节点 root 和一个整数目标和 targetSum ，找出所有 从根节点到叶子节点 路径总和等于给定目标和的路径。
-```
-
-思路：递归前序遍历
-```java
-class solution {
-    public List<List<Integer>> pathsum(TreeNode root, int targetsum) {
-        List<List<Integer>> res = new ArrayList<>();
-        if (root == null) return res; // 非空判断
-
-        List<Integer> path = new LinkedList<>();
-        preorderdfs(root, targetsum, res, path);
-        return res;
-    }
-
-    public void preorderdfs(TreeNode root, int targetsum, List<List<Integer>> res, List<Integer> path) {
-        path.add(root.val);
-        // 遇到了叶子节点
-        if (root.left == null && root.right == null) {
-            // 找到了和为 targetsum 的路径
-            if (targetsum - root.val == 0) {
-                res.add(new ArrayList<>(path));
-            }
-            return; // 如果和不为 targetsum，返回
-        }
-
-        if (root.left != null) {
-            preorderdfs(root.left, targetsum - root.val, res, path);
-            path.remove(path.size() - 1); // 回溯
-        }
-        if (root.right != null) {
-            preorderdfs(root.right, targetsum - root.val, res, path);
-            path.remove(path.size() - 1); // 回溯
-        }
-    }
-}
-```
-
-### 106 从中序与后序遍历序列构造二叉树 middle
+## 106 从中序与后序遍历序列构造二叉树 middle
 ```
 给定两个整数数组 inorder 和 postorder ，其中 inorder 是二叉树的中序遍历， postorder 是同一棵树的后序遍历，请你构造并返回这颗 二叉树 。
 ```
@@ -173,61 +131,6 @@ class Solution {
         root.right = findNode(inorder, rootIndex + 1, inEnd,
                             postorder, postBegin + lenOfLeft, postEnd - 1); //用右中序、右后序构造右子树
         return root;
-    }
-}
-```
-
-### 105 从前序与中序遍历序列构造二叉树 middle
-```
-给定两个整数数组 preorder 和 inorder ，其中 preorder 是二叉树的先序遍历， inorder 是同一棵树的中序遍历，请构造二叉树并返回其根节点。
-```
-https://programmercarl.com/0106.%E4%BB%8E%E4%B8%AD%E5%BA%8F%E4%B8%8E%E5%90%8E%E5%BA%8F%E9%81%8D%E5%8E%86%E5%BA%8F%E5%88%97%E6%9E%84%E9%80%A0%E4%BA%8C%E5%8F%89%E6%A0%91.html
-
-思路：与106类似
-```java
-class Solution {
-    Map<Integer, Integer> map;
-    public TreeNode buildTree(int[] preorder, int[] inorder) {
-        map = new HashMap<>();
-        for (int i = 0; i < inorder.length; i++) { // 用map保存中序序列的数值对应位置
-            map.put(inorder[i], i);
-        }
-
-        return findNode(preorder, 0, preorder.length, inorder,  0, inorder.length);  // 前闭后开
-    }
-
-    public TreeNode findNode(int[] preorder, int preBegin, int preEnd, int[] inorder, int inBegin, int inEnd) {
-        // 参数里的范围都是前闭后开
-        if (preBegin >= preEnd || inBegin >= inEnd) {  // 不满足左闭右开，说明没有元素，返回空树
-            return null;
-        }
-        int rootIndex = map.get(preorder[preBegin]);  // 找到前序遍历的第一个元素在中序遍历中的位置
-        TreeNode root = new TreeNode(inorder[rootIndex]);  // 构造结点
-        int lenOfLeft = rootIndex - inBegin;  // 保存中序左子树个数，用来确定前序数列的个数
-        root.left = findNode(preorder, preBegin + 1, preBegin + lenOfLeft + 1,
-                inorder, inBegin, rootIndex);
-        root.right = findNode(preorder, preBegin + lenOfLeft + 1, preEnd,
-                inorder, rootIndex + 1, inEnd);
-
-        return root;
-    }
-}
-class Solution {
-    int[] preorder;
-    HashMap<Integer, Integer> dic = new HashMap<>();
-    public TreeNode buildTree(int[] preorder, int[] inorder) {
-        this.preorder = preorder;
-        for(int i = 0; i < inorder.length; i++)
-            dic.put(inorder[i], i);
-        return recur(0, 0, inorder.length - 1);
-    }
-    TreeNode recur(int root, int left, int right) {
-        if (left > right) return null;                          // 递归终止
-        TreeNode node = new TreeNode(preorder[root]);          // 建立根节点
-        int i = dic.get(preorder[root]);                       // 划分根节点、左子树、右子树
-        node.left = recur(root + 1, left, i - 1);              // 开启左子树递归
-        node.right = recur(root + i - left + 1, i + 1, right); // 开启右子树递归
-        return node;                                           // 回溯返回根节点
     }
 }
 ```
