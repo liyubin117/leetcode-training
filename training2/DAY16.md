@@ -1,6 +1,6 @@
 # day16
 
-## 513 找树左下角的值
+## 513 找树左下角的值 middle
 ```
 给定一个二叉树的 根节点 root，请找出该二叉树的 最底层 最左边 节点的值。
 
@@ -8,33 +8,25 @@
 ```
 https://programmercarl.com/0513.%E6%89%BE%E6%A0%91%E5%B7%A6%E4%B8%8B%E8%A7%92%E7%9A%84%E5%80%BC.html
 
-思路：递归前序遍历或迭代
+思路：
+- 递归前序遍历，当截止条件是到叶节点且深度大于此前的最大深度时，说明已经到了树的某个左下角但不一定是最底层，更新此时的深度和结果，继续递归最终取得结果
+- 迭代
 ```java
 //递归
 class Solution {
     private int maxDepth = Integer.MIN_VALUE;
     private int result = 0;
-
     public int findBottomLeftValue(TreeNode root) {
         recurse(root, 1);
         return result;
     }
-
     private void recurse(TreeNode node, int depth) {
         if (node.left == null && node.right == null && depth > maxDepth) {
             maxDepth = depth;
             result = node.val;
         }
-        if (node.left != null) {
-            depth++;
-            recurse(node.left, depth);
-            depth--; //回溯
-        }
-        if (node.right != null) {
-            depth++;
-            recurse(node.right, depth);
-            depth--; //回溯
-        }
+        if (node.left != null) recurse(node.left, depth + 1);
+        if (node.right != null) recurse(node.right, depth + 1);
     }
 }
 //迭代
