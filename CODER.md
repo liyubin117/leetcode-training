@@ -231,7 +231,7 @@ for 状态1 in 状态1的所有取值：
   - dp数组定义：dp[j]，容量j的背包所能得到的最大价值
   - 递推公式：dp[j] = max(dp[j], dp[j - weight[i]] + value[i])
   - dp数组初始化：dp[j] = 0，初始化成非负的最小值0，防止max覆盖之前推导出的结果
-  - 遍历顺序：倒序从大到小，先遍历物品再遍历背包。倒序是为了防止重复添加物品
+  - 遍历顺序：先遍历物品再倒序遍历背包容量。倒序是为了防止重复添加物品
 #### 分割等和子集，能不能装满容量j的背包，按价值=重量=元素值处理，dp[j] = Math.max(dp[j], dp[j - nums[i]] + nums[i])，最终dp[target]==target则说明装满重量target的背包的最大价值是target也即最大重量是target，说明此时已经装满
 #### 最后一块石头重量，容量j的背包的最大重量，按价值=重量=元素值处理 dp[j] = Math.max(dp[j], dp[j - stones[i]] + stones[i])
 #### 目标和，有多少种方法能装满容量j的背包 dp[i][j] = Math.max(dp[i][j], dp[i - zeroNum][j - oneNum] + 1)
