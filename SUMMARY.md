@@ -2,6 +2,7 @@
 
 * [coder](CODER.md)
 * leetcode
+  * [Top100](leetcode/Top100.md)
   * [数组](leetcode/数组.md)
   * [链表](leetcode/链表.md)
   * [矩阵](leetcode/矩阵.md)
