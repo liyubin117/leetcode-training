@@ -389,6 +389,7 @@ m大于等于3，小于等于14，即在蔡勒公式中，某年的1,2月份要�
   * list.remove() 当传入参数是int型时认为是删除某索引的值，传入Object引用型时删除对应的对象
     - list.remove(1) 删除1索引的值
     - list.remove(Integer.valueOf(1)) 删除1对象
+  - new LinkedList()#getLast()
 * Set
   * set.stream().mapToInt(Integer::intValue).toArray() 将一个Set<Integer>转换成int[]
 * Integer
