@@ -416,6 +416,12 @@ m大于等于3，小于等于14，即在蔡勒公式中，某年的1,2月份要�
 
 # 常用java类
 * 栈 Stack ArrayDeque 后者支持removeLast即可两端操作
-* 双端队列 LinkedList
+* 双端队列
+  * LinkedList 有pollFirst() pollLast() offerFirst() offerLast()
+  * LinkedHashSet 维护一个贯穿其所有条目的双向链表。此链表定义了迭代顺序，即元素插入到集合中的顺序 （insertion-order）。请注意，如果将元素重新插入到集合中，则插入顺序不受影响。但删除首元素比较复杂，删除第一个元素：set.remove(set.iterator().next())
 * 优先级队列 PriorityQueue 默认是最小堆，自定义比较器是p1 - p2。最大堆的自定义比较器是p2 - p1
-* Map的键序：HashTable.keySet()-降序；TreeMap.keySet()-升序;HashMap.keySet()-乱序;LinkedHashMap.keySet() 原序
+* Map的键序
+  * HashTable.keySet()-降序
+  * TreeMap.keySet()-升序
+  * HashMap.keySet()-乱序
+  * LinkedHashMap.keySet() 原序
