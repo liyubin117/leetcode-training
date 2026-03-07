@@ -11,6 +11,23 @@ int m = arr.length, n = arr[0].length
 一维索引是i，则对应的x是i/n，y是i%n
 
 # 滑动窗口
+时间复杂度：O(N)
+```
+// 索引区间 [left, right) 是窗口
+int left = 0, right = 0;
+
+while (right < nums.size()) {
+    // 增大窗口
+    window.addLast(nums[right]);
+    right++;
+    
+    while (window needs shrink) {
+        // 缩小窗口
+        window.removeFirst(nums[left]);
+        left++;
+    }
+}
+```
 <img src="https://pic.leetcode-cn.com/1601027592-GJTzPP-file_1601027592222"/>滑动窗口口诀</img>
 
 特殊的双指针，常用于数组连续子串问题 209 1456
