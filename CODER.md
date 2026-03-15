@@ -234,21 +234,27 @@ for 状态1 in 状态1的所有取值：
 1. 二维解法
 竖是物品，横是容量
   - dp数组定义：dp[i][j]，[0,i]区间内的物品任取放到容量j的背包所能得到的最大价值
-  - 递推公式：
-    - 放不下物品i：dp[i][j] = dp[i - 1][j]
-    - 能放下物品i：dp[i][j] = max(dp[i - 1][j], dp[i - 1][j - weight[i]] + value[i])
-      - 不放物品i：dp[i - 1][j]
-      - 放物品i：减小了背包载重后且不放物品i的最大价值再加上i的价值：dp[i - 1][j - weight[i]] + value[i]
+  - 递推公式：dp[i][j] = max(dp[i - 1][j], dp[i - 1][j - weight[i]] + value[i])
+    - 不放物品i：dp[i - 1][j]
+    - 放物品i：减小了背包载重后且不放物品i的最大价值再加上i的价值：dp[i - 1][j - weight[i]] + value[i]
   - 初始化：由于容量0也要占一个第二维空间，若种类M，容量N，则整个dp数组先初始化成dp[M][N+1]。dp[i][j]是由二维数组的左上方、正上方共同推出来的，因此要初始化第一行和第一列
     - 竖：容量0的背包放不进任何物品，因此dp[i][0] = 0
     - 横：若物品0重量小于等于容量时说明能放进物品0，因此初始化dp[0][j]成values[0]，大于时说明放不进因此初始化成0。
   - 遍历顺序：正序从小到大，且可先遍历物品再遍历背包，也可先遍历背包再遍历物品。由于是由左上方、正上方推导而来因此两个顺序都行
 2. 一维解法
-滚动数组，把上一层的数据拷贝到当前层
+滚动数组，把上一层的数据拷贝到当前层（计算较大的价值时，dp[j]相当于dp[i-1][j], dp[j-weight[i]]+value[i]相当于dp[i-1][j-weight[i])+value[i]）
   - dp数组定义：dp[j]，容量j的背包所能得到的最大价值
   - 递推公式：dp[j] = max(dp[j], dp[j - weight[i]] + value[i])
   - dp数组初始化：dp[j] = 0，初始化成非负的最小值0，防止max覆盖之前推导出的结果
   - 遍历顺序：先遍历物品再倒序遍历背包容量。倒序是为了防止重复添加物品
+```
+int[] dp = new int[目标weight + 1];
+for (int i = 0; i < 物品数量; i++) {
+  for (int j = 目标weight; j >= weight[i]; j--) {
+    dp[j] = max(dp[j], dp[j - weight[i]] + value[i]);
+  }
+}
+```
 #### 分割等和子集，能不能装满容量j的背包，按价值=重量=元素值处理，dp[j] = Math.max(dp[j], dp[j - nums[i]] + nums[i])，最终dp[target]==target则说明装满重量target的背包的最大价值是target也即最大重量是target，说明此时已经装满
 #### 最后一块石头重量，容量j的背包的最大重量，按价值=重量=元素值处理 dp[j] = Math.max(dp[j], dp[j - stones[i]] + stones[i])
 #### 目标和，有多少种方法能装满容量j的背包 dp[i][j] = Math.max(dp[i][j], dp[i - zeroNum][j - oneNum] + 1)
