@@ -50,7 +50,7 @@ jdk提供了方法：Arrays.binarySearch(T[] arr, T)
 峰值问题，可以不用有序
 
 平方问题，注意二分比较时可能出现超过int型的情况，比较时要转long
-```
+```java
 private static int search(int[] nums, int target) {
     int l = 0, r = nums.length - 1;
     while (l <= r) {
@@ -62,6 +62,23 @@ private static int search(int[] nums, int target) {
     return -1;
     }
 ```
+# 链表
+所有涉及链表的翻转都可以用头插法，首先要找到要翻转的头节点的前一个节点prev
+```java
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        ListNode dummy = new ListNode(0, head), prev = dummy, cur = prev.next;
+        while (cur != null && cur.next != null) {
+            ListNode next = cur.next;
+            cur.next = next.next;
+            next.next = prev.next;
+            prev.next = next;
+        }
+        return dummy.next;
+    }
+}
+```
+
 # 双指针
 1. 普通双指针：同向移动 O(N^2)
 2. 碰撞双指针：对向移动 O(N) 前提输入数据必须是有序
@@ -224,6 +241,9 @@ for 状态1 in 状态1的所有取值：
 ```
 
 ## 背包问题
+- 01背包正物反包
+- 完全组合背包正物正包
+- 完全排列背包正包正物
 ![image](images/dp_package.png)
 
 ### 01背包
@@ -276,7 +296,7 @@ for (int i = 0; i < 物品数量; i++) {
             }
         }
   ```
-  - 排列：只能是先遍历背包再遍历物品，注意必须在最里层循环内（注意不在for内加）加if判断，只在需要调用递推公式时执行，不然同一个j的不同i情况会互相影响
+  - 排列：只能是先正序背包再正序遍历物品，注意必须在最里层循环内（注意不在for内加）加if判断，只在需要调用递推公式时执行，不然同一个j的不同i情况会互相影响
   ```
   for (int j = 1; j <= target; j++) {
             for (int i = 0; i < nums.length; i++) {
